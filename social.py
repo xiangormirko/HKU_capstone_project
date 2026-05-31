@@ -109,7 +109,7 @@ class SocialData:
                 "avg_sentiment": c["avg_sentiment"],
                 "sentiment_label": _label(c["avg_sentiment"]),
                 "angle": angle,
-                "rationale": f"{c['n_posts']} conversations · {_label(s)} mood — {why}.",
+                "rationale": f"{c['n_posts']} conversations — {why}.",
                 "incumbents": c["top_products"][:3],
                 "opportunity_score": round(score, 3),
             })

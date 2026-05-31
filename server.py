@@ -40,6 +40,16 @@ def serve_js(fname):
     return send_from_directory(HERE, f"{fname}.js", mimetype="application/javascript")
 
 
+@app.route("/<path:fname>.svg")
+def serve_svg(fname):
+    return send_from_directory(HERE, f"{fname}.svg", mimetype="image/svg+xml")
+
+
+@app.route("/<path:fname>.png")
+def serve_png(fname):
+    return send_from_directory(HERE, f"{fname}.png", mimetype="image/png")
+
+
 @app.route("/api/data")
 def api_data():
     return jsonify(get_data().build_payload(request.args.get("year")))

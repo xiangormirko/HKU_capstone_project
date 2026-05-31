@@ -37,10 +37,6 @@ async function loadSocialOverview() {
   try {
     SOCIAL_OV = await fetch('/api/social/overview').then(r => r.json());
   } catch (e) { console.error(e); return; }
-  const m = SOCIAL_OV.meta;
-  document.getElementById('socialSource').textContent =
-    `Currently indexing ${m.n_posts.toLocaleString()} posts + ${m.n_comments.toLocaleString()} comments from r/${m.subreddits.join(', r/')}.`;
-
   // example chips
   document.getElementById('exampleChips').innerHTML =
     SOCIAL_OV.example_queries.map(q => `<div class="chip" data-q="${esc(q)}">${esc(q)}</div>`).join('');
@@ -64,7 +60,7 @@ function renderInsights(ins) {
     <div class="opp-launch">
       <span class="tag-angle ${ANGLE_CLASS[o.angle] || 'differentiate'}">${esc(o.angle)}</span>
       <h4>${esc(o.category)}</h4>
-      <div class="meta">${o.n_posts} conversations · <span class="${sentClass(o.sentiment_label)}">${o.sentiment_label}</span></div>
+      <div class="meta">${o.n_posts} conversations</div>
       <div class="why">${esc(o.rationale)}</div>
       <div class="incumbents">Incumbents to beat: <strong>${o.incumbents.map(esc).join(', ') || '—'}</strong></div>
       <button class="cta-btn" data-q="${esc(o.category)}">Explore demand →</button>
@@ -78,7 +74,6 @@ function renderInsights(ins) {
         </div>
         <div class="insights-stats">
           <div class="stat"><div class="v">${(h.n_posts || 0).toLocaleString()}</div><div class="l">posts analyzed</div></div>
-          <div class="stat"><div class="v ${sentClass(h.overall_label)}">${h.overall_sentiment >= 0 ? '+' : ''}${(h.overall_sentiment ?? 0).toFixed(2)}</div><div class="l">overall mood</div></div>
           <div class="stat"><div class="v">${h.n_categories || 0}</div><div class="l">categories</div></div>
         </div>
       </div>
@@ -93,10 +88,6 @@ function renderOverview() {
       <h4>${esc(c.category)}</h4>
       <div class="ov-meta">
         <span>${c.n_posts} posts</span>
-        <span class="${sentClass(label(c.avg_sentiment))}">${label(c.avg_sentiment)}</span>
-      </div>
-      <div style="font-size:11px;color:var(--text2);margin-top:8px">
-        ${c.top_products.length ? 'Top: ' + c.top_products.slice(0, 3).map(esc).join(', ') : 'Various products'}
       </div>
     </div>`;
   const TOP_N = 8;
@@ -143,6 +134,8 @@ function goHome() {
   document.getElementById('socialResults').innerHTML = '';
   const cat = document.getElementById('socialCategory');
   if (cat) { cat.style.display = 'none'; cat.innerHTML = ''; }
+  const ss = document.getElementById('socialSearchSection');   // restore title + search
+  if (ss) ss.style.display = '';
   document.getElementById('socialOverview').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }

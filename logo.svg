@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 132" fill="none">
+  <!-- shield -->
+  <path d="M22 27 L54 27 L60 32.5 L66 27 L98 27 L98 66 C98 92.5 81 110.5 60 121 C39 110.5 22 92.5 22 66 Z" fill="#F2802A"/>
+  <path d="M31.5 36.5 L88.5 36.5 L88.5 65 C88.5 86.5 74.5 101 60 109 C45.5 101 31.5 86.5 31.5 65 Z" fill="#FFFFFF"/>
+  <g fill="#2B3A4E">
+    <!-- P stem -->
+    <rect x="42" y="54" width="11.5" height="48" rx="5.75"/>
+    <!-- magnifier lens ring (outer r20, inner r10) -->
+    <path fill-rule="evenodd" d="M64 44 a20 20 0 1 0 0.001 0 Z M64 54 a10 10 0 1 1 -0.001 0 Z"/>
+    <!-- handle -->
+    <rect x="78.5" y="71" width="11.5" height="27" rx="5.75" transform="rotate(-45 84.25 84.5)"/>
+    <!-- star inside lens -->
+    <path d="M64 55 L66.12 61.09 L72.56 61.22 L67.42 65.11 L69.29 71.28 L64 67.6 L58.71 71.28 L60.58 65.11 L55.44 61.22 L61.88 61.09 Z"/>
+  </g>
+</svg>

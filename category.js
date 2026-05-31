@@ -18,6 +18,8 @@ window.openCategory = async function openCategory(name) {
   const box = document.getElementById('socialCategory');
   document.getElementById('socialOverview').style.display = 'none';
   document.getElementById('socialResults').innerHTML = '';
+  const ss = document.getElementById('socialSearchSection');   // hide title + search on detail page
+  if (ss) ss.style.display = 'none';
   destroyCatCharts();
   box.style.display = 'block';
   box.innerHTML = `<button class="home-btn" onclick="goHome()">← All categories</button>
