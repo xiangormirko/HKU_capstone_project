@@ -1,0 +1,22 @@
+{
+  "title": "Share of U.S. respondents who define their skin type as the following",
+  "metric": "percent of respondents (multiple answers possible)",
+  "geography": "United States",
+  "age_range": "18-64",
+  "sample_size": 60800,
+  "survey_period": "Jul 2024 - Jun 2025",
+  "source": "Statista Consumer Insights",
+  "source_url": "https://www.statista.com/chart/34867/share-of-respondents-skin-types/",
+  "license": "Creative Commons (CC BY-ND) — Statista Infographics, free to use with attribution",
+  "note": "Respondents could select multiple skin descriptors, so shares do not sum to 100%. The blended 'approx_all_pct' is a simple average of men/women (US adult gender split is ~50/50); treat as an estimate.",
+  "skin_types": [
+    {"type": "Normal", "men": 39, "women": 24, "related_category": null},
+    {"type": "Dry", "men": 31, "women": 36, "related_category": "Moisturizer & Hydration"},
+    {"type": "Sensitive", "men": 28, "women": 34, "related_category": "Sensitive & Barrier"},
+    {"type": "Oily", "men": 23, "women": 21, "related_category": "Cleanser & Oil Control"},
+    {"type": "Combination", "men": 16, "women": 26, "related_category": null},
+    {"type": "Prone to redness", "men": 13, "women": 16, "related_category": "Sensitive & Barrier"},
+    {"type": "Prone to dark circles", "men": 12, "women": 18, "related_category": "Brightening & Dark Spots"},
+    {"type": "Prone to allergic reactions/irritations", "men": 12, "women": 16, "related_category": "Sensitive & Barrier"}
+  ]
+}

@@ -73,7 +73,7 @@
   .year-select:focus { border-color:var(--accent); }
 
   /* ── Layout ── */
-  .dashboard { display:grid; grid-template-columns:1fr 380px; min-height:calc(100vh - 70px); }
+  .dashboard { display:block; min-height:calc(100vh - 70px); }
 
   .main-content { padding:24px; overflow-y:auto; max-height:calc(100vh - 70px); }
 
@@ -221,12 +221,34 @@
   .opp-metric { font-size:11px; color:var(--text2); }
   .opp-metric strong { color:var(--text); }
 
-  /* ── AI Panel ── */
+  /* ── AI Panel — global slide-in drawer ── */
   .ai-panel {
+    position:fixed; top:0; right:0; height:100vh; width:400px; max-width:92vw;
     background:var(--surface); border-left:1px solid var(--border);
-    display:flex; flex-direction:column; height:calc(100vh - 70px);
-    position:sticky; top:70px;
+    display:flex; flex-direction:column; z-index:300;
+    transform:translateX(101%); transition:transform .28s cubic-bezier(.4,0,.2,1);
+    box-shadow:-12px 0 40px rgba(0,0,0,.45);
   }
+  .ai-panel.open { transform:translateX(0); }
+
+  /* floating toggle button — present on every page */
+  .ai-fab {
+    position:fixed; bottom:24px; right:24px; z-index:250;
+    width:56px; height:56px; border-radius:18px; border:none; cursor:pointer;
+    background:linear-gradient(135deg, var(--accent), var(--accent3)); color:#fff;
+    font-size:24px; display:flex; align-items:center; justify-content:center;
+    box-shadow:0 8px 24px rgba(108,92,231,.5); transition:transform .2s, opacity .2s;
+  }
+  .ai-fab:hover { transform:scale(1.07); }
+  .ai-fab.hidden { opacity:0; pointer-events:none; transform:scale(.7); }
+
+  .ai-close {
+    margin-left:auto; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text2); width:30px; height:30px; border-radius:8px; cursor:pointer;
+    font-size:13px; display:flex; align-items:center; justify-content:center; transition:.2s; flex-shrink:0;
+  }
+  .ai-close:hover { color:var(--text); border-color:var(--accent); }
+
   .ai-header {
     padding:20px; border-bottom:1px solid var(--border);
     display:flex; align-items:center; gap:10px;
@@ -422,6 +444,86 @@
   }
   .cta-btn:hover { filter:brightness(1.12); transform:translateX(2px); }
 
+  /* ── Category detail page ── */
+  .cat-page-head { display:flex; align-items:center; justify-content:space-between; gap:14px; flex-wrap:wrap; margin:14px 0 6px; }
+  .cat-page-head h2 { font-size:22px; font-weight:700; }
+  .cat-head-meta { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .module { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:18px; }
+  .module-head { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:14px; flex-wrap:wrap; }
+  .module-head h3 { font-size:16px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .module-head .src-badge { font-size:10px; font-weight:600; color:var(--text2); background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:3px 9px; }
+  .src-badge.sample { color:var(--warning); border-color:rgba(253,203,110,.35); }
+
+  /* Amazon summary strip */
+  .amz-summary { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:16px; }
+  .amz-stat { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:13px; }
+  .amz-stat .v { font-size:21px; font-weight:700; }
+  .amz-stat .l { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; margin-top:3px; }
+  .amz-stat .s { font-size:11px; color:var(--text2); margin-top:3px; }
+  .stars-amz { color:var(--warning); letter-spacing:1px; }
+
+  /* sourcer insight callout */
+  .insight-callout { background:#0d1322; border:1px solid var(--border); border-radius:11px; padding:15px 18px; margin-bottom:16px; }
+  .insight-callout .ic-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text2); margin-bottom:10px; }
+  .ic-row { display:flex; gap:10px; align-items:baseline; font-size:13px; line-height:1.55; color:var(--text); margin-bottom:8px; }
+  .ic-row:last-child { margin-bottom:0; }
+  .ic-tag { flex-shrink:0; font-size:10px; font-weight:700; padding:2px 8px; border-radius:5px; letter-spacing:.3px; }
+  .ic-tag.opportunity { background:rgba(253,203,110,.18); color:var(--warning); }
+  .ic-tag.good { background:rgba(0,184,148,.16); color:var(--positive); }
+  .ic-tag.bad { background:rgba(214,48,49,.16); color:var(--negative); }
+  .ic-tag.neutral { background:rgba(108,92,231,.16); color:var(--accent2); }
+
+  /* expandable details toggle */
+  .expand-btn { width:100%; display:flex; justify-content:space-between; align-items:center; gap:10px;
+    background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px 16px;
+    color:var(--text); font-size:13px; font-weight:600; cursor:pointer; transition:.2s; margin-top:4px; }
+  .expand-btn:hover { border-color:var(--accent); background:rgba(108,92,231,.08); }
+  .expand-btn .tg-ico { color:var(--accent2); display:inline-block; width:14px; }
+  .expand-btn .tg-count { color:var(--text2); font-size:11px; font-weight:400; }
+  .amz-details { margin-top:14px; }
+
+  /* product table */
+  .amz-table { width:100%; border-collapse:collapse; font-size:13px; }
+  .amz-table th { text-align:left; padding:8px 10px; font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--text2); border-bottom:1px solid var(--border); font-weight:600; }
+  .amz-table td { padding:10px; border-bottom:1px solid rgba(35,45,69,.5); vertical-align:middle; }
+  .amz-table tr:hover td { background:rgba(108,92,231,.04); }
+  .amz-brand { font-weight:600; }
+  .amz-brand small { display:block; color:var(--text2); font-weight:400; font-size:10px; margin-top:1px; max-width:300px; }
+  .negbar-wrap { display:flex; align-items:center; gap:7px; }
+  .negbar { height:6px; width:90px; background:var(--surface2); border-radius:3px; overflow:hidden; }
+  .negbar div { height:100%; border-radius:3px; }
+  .aspect-chip { font-size:10px; background:rgba(214,48,49,.12); color:var(--negative); border-radius:8px; padding:2px 7px; }
+
+  .amz-chart-wrap { position:relative; height:300px; }
+
+  /* voice of customer */
+  .voc-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  .voc-col-label { font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.5px; margin-bottom:10px; }
+  .quote-card { background:var(--surface2); border:1px solid var(--border); border-left:3px solid var(--qc); border-radius:9px; padding:13px; margin-bottom:10px; }
+  .qc-top { display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px; }
+  .qc-brand { font-size:11px; font-weight:700; }
+  .qc-meta { font-size:10px; color:var(--text2); white-space:nowrap; }
+  .qc-text { font-size:12px; line-height:1.6; color:var(--text); font-style:italic; }
+
+  /* trends */
+  .trend-related { display:flex; flex-wrap:wrap; gap:7px; margin-top:6px; }
+  .rising-row { display:flex; justify-content:space-between; gap:10px; align-items:center; font-size:12px; padding:7px 0; border-bottom:1px solid rgba(35,45,69,.5); }
+  .rising-row .chg { color:var(--positive); font-weight:600; white-space:nowrap; }
+  .rising-row .chg.neg { color:var(--negative); }
+  .trend-tabs { display:flex; gap:6px; margin-bottom:12px; }
+  .tcountry { background:var(--surface2); border:1px solid var(--border); color:var(--text2); border-radius:18px; padding:6px 14px; font-size:12px; font-weight:600; cursor:pointer; transition:.2s; }
+  .tcountry:hover { color:var(--text); }
+  .tcountry.active { background:var(--accent); color:#fff; border-color:transparent; }
+  .trend-summary { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:12px; font-size:12px; color:var(--text2); }
+  .trend-metric { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:3px 9px; }
+  .trend-metric strong { color:var(--text); }
+  .trend-badge { font-size:10px; font-weight:700; padding:2px 8px; border-radius:10px; text-transform:capitalize; }
+  .trend-badge.sm { font-size:9px; padding:1px 6px; margin-left:5px; }
+  .trend-badge.t-rising { background:rgba(0,184,148,.16); color:var(--positive); }
+  .trend-badge.t-declining { background:rgba(214,48,49,.16); color:var(--negative); }
+  .trend-badge.t-stable { background:rgba(253,203,110,.16); color:var(--warning); }
+  .trend-badge.t-muted { background:var(--surface2); color:var(--text2); }
+
   /* ── Source-to-Sell fusion ── */
   .fusion-headline {
     background:linear-gradient(135deg, rgba(0,206,201,.14), rgba(108,92,231,.12));
@@ -474,11 +576,15 @@
 
   /* ── Responsive ── */
   @media (max-width:1200px) {
-    .dashboard { grid-template-columns:1fr; }
-    .ai-panel { height:500px; position:relative; top:0; }
     .kpi-row { grid-template-columns:repeat(2,1fr); }
     .chart-grid { grid-template-columns:1fr; }
     .summary-strip { grid-template-columns:1fr; }
+  }
+  /* mobile: the AI drawer takes the full width of the viewport
+     (anchor both edges so it fills edge-to-edge regardless of vw quirks) */
+  @media (max-width:768px) {
+    .ai-panel { left:0; right:0; width:auto; max-width:none; }
+    .ai-fab { bottom:18px; right:18px; }
   }
 </style>
 </head>
@@ -657,6 +763,41 @@
 
 </div>
 
+</div>
+</div><!-- /view-trade -->
+
+<!-- ═══════════ VIEW: SOCIAL DISCOVERY ═══════════ -->
+<div id="view-social" class="view">
+  <div class="social-wrap">
+    <div class="social-hero">
+      <h2>Discover products &amp; sentiment from social conversations</h2>
+      <p>Search a need or product category — find relevant posts, the products people mention, and how they feel about them.
+         <span id="socialSource" style="color:var(--accent2)"></span></p>
+    </div>
+    <div class="search-row">
+      <input class="social-search" id="socialSearch" placeholder="e.g. oily skin remover, retinol for wrinkles, korean sunscreen…" />
+      <button class="search-btn" id="socialSearchBtn">Search</button>
+    </div>
+    <div class="chips" id="exampleChips"></div>
+
+    <div id="socialResults"></div>
+    <div id="socialCategory" style="display:none"></div>
+    <div id="socialOverview"></div>
+  </div>
+</div>
+
+<!-- ═══════════ VIEW: SOURCE-TO-SELL (TRADE × SOCIAL FUSION) ═══════════ -->
+<div id="view-fusion" class="view">
+  <div class="social-wrap">
+    <div class="social-hero">
+      <h2>Source-to-Sell Opportunities</h2>
+      <p>Where consumer demand meets trade flows — <strong>source</strong> from the origins whose
+         brands shoppers love, <strong>sell</strong> into markets importing more than they make.</p>
+    </div>
+    <div id="fusionContent"><div style="text-align:center;color:var(--text2);padding:40px">Loading fusion…</div></div>
+  </div>
+</div>
+
 <!-- ═══════════ AI PANEL ═══════════ -->
 <div class="ai-panel">
   <div class="ai-header">
@@ -665,6 +806,7 @@
       <h3>Product Scout AI</h3>
       <span>Trade data + social sentiment, together</span>
     </div>
+    <button class="ai-close" id="aiClose" title="Close" aria-label="Close AI assistant">&#10005;</button>
   </div>
 
   <div class="ai-messages" id="aiMessages">
@@ -691,43 +833,11 @@
     </button>
   </div>
 </div>
-
-</div>
-</div><!-- /view-trade -->
-
-<!-- ═══════════ VIEW: SOCIAL DISCOVERY ═══════════ -->
-<div id="view-social" class="view">
-  <div class="social-wrap">
-    <div class="social-hero">
-      <h2>Discover products &amp; sentiment from social conversations</h2>
-      <p>Search a need or product category — find relevant posts, the products people mention, and how they feel about them.
-         <span id="socialSource" style="color:var(--accent2)"></span></p>
-    </div>
-    <div class="search-row">
-      <input class="social-search" id="socialSearch" placeholder="e.g. oily skin remover, retinol for wrinkles, korean sunscreen…" />
-      <button class="search-btn" id="socialSearchBtn">Search</button>
-    </div>
-    <div class="chips" id="exampleChips"></div>
-
-    <div id="socialResults"></div>
-    <div id="socialOverview"></div>
-  </div>
-</div>
-
-<!-- ═══════════ VIEW: SOURCE-TO-SELL (TRADE × SOCIAL FUSION) ═══════════ -->
-<div id="view-fusion" class="view">
-  <div class="social-wrap">
-    <div class="social-hero">
-      <h2>Source-to-Sell Opportunities</h2>
-      <p>Where consumer demand meets trade flows — <strong>source</strong> from the origins whose
-         brands shoppers love, <strong>sell</strong> into markets importing more than they make.</p>
-    </div>
-    <div id="fusionContent"><div style="text-align:center;color:var(--text2);padding:40px">Loading fusion…</div></div>
-  </div>
-</div>
+<button class="ai-fab" id="aiFab" title="Ask Product Scout AI" aria-label="Open AI assistant">✨</button>
 
 <script src="app.js"></script>
 <script src="social.js"></script>
+<script src="category.js"></script>
 <script src="fusion.js"></script>
 </body>
 </html>

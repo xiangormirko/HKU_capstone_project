@@ -273,6 +273,30 @@ class SocialData:
         }
 
 
+    # ---------- category page bundle (Amazon + Trends + Reddit) ----------
+    def category_page(self, name):
+        from amazon import get_amazon
+        from trends import get_trends
+        amazon = get_amazon().category(name)
+        reddit = self.search(name, limit=6)
+        cat = next((c for c in self.categories if c["category"] == name), None)
+        return {
+            "category": name,
+            "social_summary": {
+                "n_posts": cat["n_posts"] if cat else 0,
+                "avg_sentiment": cat["avg_sentiment"] if cat else None,
+                "sentiment_label": _label(cat["avg_sentiment"]) if cat else "n/a",
+                "top_products": cat["top_products"] if cat else [],
+                "top_ingredients": cat["top_ingredients"] if cat else [],
+            },
+            "amazon": amazon,
+            "trends": get_trends().category_block(name),
+            "reddit": {
+                "summary": reddit["summary"],
+                "posts": reddit["results"][:5],
+            },
+        }
+
 _social = None
 
 

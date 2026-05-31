@@ -11,6 +11,19 @@ menu bar:
    products/ingredients people mention, and how they feel about them
    (VADER sentiment). Reddit today; **Google Trends / other platforms slot in
    later** via the same source-agnostic schema.
+   - The landing shows **product categories first**, then data-driven launch
+     opportunities. **Clicking a category opens a detail page** with three
+     modules: **Amazon Reviews Intelligence** (per-product ratings, aspect-level
+     negative rates = sourcing opportunities, best-in-class benchmark,
+     voice-of-customer quotes — compiled in `amazon.py` from the review export
+     in `data/amazon/`), a **Google Trends** module (real — `trends.py` over `data/trends/metrics.csv`
+     + `timeseries.csv`: weekly search interest 0–100 for HK & JP, 2023–2025,
+     with a country toggle, a category + brand momentum line chart, rising
+     sub-categories, and brand momentum), and the **Reddit conversation** for
+     that category. Endpoint: `/api/social/category?name=`. Built for an
+     e-commerce **sourcer** persona. The Claude agent also has `amazon_reviews`
+     and `google_trends` tools, so it can reason over reviews and demand momentum
+     alongside trade and social sentiment.
 3. **🎯 Source-to-Sell** — the fusion of the two: links social brand demand to
    country trade flows via **brand origin**. Shows **where to source** (origin
    countries whose brands shoppers love, scored vs their cosmetics export

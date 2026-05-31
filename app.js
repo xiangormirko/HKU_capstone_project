@@ -391,6 +391,22 @@ document.getElementById('aiInput').addEventListener('keydown', e => {
 });
 document.querySelectorAll('.suggested-q').forEach(el => el.addEventListener('click', () => handleQuery(el.dataset.q)));
 
+// ───────────────────────── AI drawer toggle (global) ─────────────────────────
+function openAI() {
+  document.querySelector('.ai-panel').classList.add('open');
+  document.getElementById('aiFab').classList.add('hidden');
+  setTimeout(() => document.getElementById('aiInput').focus(), 300);
+}
+function closeAI() {
+  document.querySelector('.ai-panel').classList.remove('open');
+  document.getElementById('aiFab').classList.remove('hidden');
+}
+document.getElementById('aiFab').addEventListener('click', openAI);
+document.getElementById('aiClose').addEventListener('click', closeAI);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.querySelector('.ai-panel').classList.contains('open')) closeAI();
+});
+
 // ───────────────────────── init ─────────────────────────
 (async function init() {
   try {

@@ -88,7 +88,7 @@ function renderInsights(ins) {
 
 function renderOverview() {
   const ov = SOCIAL_OV;
-  const catCards = ov.categories.map(c => `
+  const card = c => `
     <div class="ov-card" data-q="${esc(c.category)}">
       <h4>${esc(c.category)}</h4>
       <div class="ov-meta">
@@ -98,13 +98,20 @@ function renderOverview() {
       <div style="font-size:11px;color:var(--text2);margin-top:8px">
         ${c.top_products.length ? 'Top: ' + c.top_products.slice(0, 3).map(esc).join(', ') : 'Various products'}
       </div>
-    </div>`).join('');
+    </div>`;
+  const TOP_N = 8;
+  const topCards = ov.categories.slice(0, TOP_N).map(card).join('');
+  const restCount = Math.max(0, ov.categories.length - TOP_N);
+  const restCards = ov.categories.slice(TOP_N).map(card).join('');
+  const catCards = `<div class="ov-grid">${topCards}</div>` + (restCount ? `
+    <div class="ov-grid" id="ovGridRest" style="display:none;margin-top:14px">${restCards}</div>
+    <button class="home-btn" id="ovMoreBtn" style="margin-top:14px">▸ Show ${restCount} more categories</button>` : '');
 
   document.getElementById('socialOverview').innerHTML = `
-    ${renderInsights(ov.insights)}
+    <div class="section-title" style="margin-top:8px"><div class="dot" style="background:var(--accent)"></div> Browse by product category <span style="font-size:11px;color:var(--text2);font-weight:400">— click a category for Amazon reviews & search trends</span></div>
+    ${catCards}
 
-    <div class="section-title" style="margin-top:24px"><div class="dot" style="background:var(--accent)"></div> Browse by product category</div>
-    <div class="ov-grid">${catCards}</div>
+    ${renderInsights(ov.insights)}
 
     <div class="section-title" style="margin-top:28px"><div class="dot" style="background:var(--accent3)"></div> Most-discussed products</div>
     <div class="ent-list">${ov.top_brands.map(b => pill(b.entity, label(b.avg_sentiment))).join('')}</div>
@@ -112,17 +119,34 @@ function renderOverview() {
     <div class="section-title" style="margin-top:24px"><div class="dot" style="background:var(--accent4)"></div> Trending ingredients</div>
     <div class="ent-list">${ov.top_ingredients.map(i => pill(i.entity, label(i.avg_sentiment))).join('')}</div>`;
 
+  // category cards & launch-opportunity CTAs open the category detail page;
+  // free-text pills/chips still run a search.
   document.querySelectorAll('#socialOverview .ov-card, #socialOverview .cta-btn').forEach(c =>
-    c.addEventListener('click', () => runSearch(c.dataset.q)));
+    c.addEventListener('click', () => window.openCategory ? window.openCategory(c.dataset.q) : runSearch(c.dataset.q)));
+
+  // show more / fewer categories
+  const moreBtn = document.getElementById('ovMoreBtn');
+  if (moreBtn) {
+    const rest = document.getElementById('ovGridRest');
+    const n = rest.querySelectorAll('.ov-card').length;
+    moreBtn.addEventListener('click', () => {
+      const open = rest.style.display === 'none';
+      rest.style.display = open ? 'grid' : 'none';
+      moreBtn.textContent = open ? '▾ Show fewer categories' : `▸ Show ${n} more categories`;
+    });
+  }
 }
 
 // return to the categories home view
 function goHome() {
   document.getElementById('socialSearch').value = '';
   document.getElementById('socialResults').innerHTML = '';
+  const cat = document.getElementById('socialCategory');
+  if (cat) { cat.style.display = 'none'; cat.innerHTML = ''; }
   document.getElementById('socialOverview').style.display = 'block';
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
+window.goHome = goHome;
 
 // client-side sentiment label (mirror of server thresholds) for overview numbers
 function label(v) {

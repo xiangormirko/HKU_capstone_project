@@ -20,6 +20,9 @@ from flask import Flask, request, jsonify, send_from_directory
 from analytics import get_data
 from social import get_social
 from fusion import get_fusion
+from amazon import get_amazon
+from trends import get_trends
+import skin_types
 
 HERE = Path(__file__).parent
 MODEL = os.environ.get("MODEL", "claude-sonnet-4-6")
@@ -53,6 +56,11 @@ def api_social_search():
     q = request.args.get("q", "")
     limit = int(request.args.get("limit", "25"))
     return jsonify(get_social().search(q, limit))
+
+
+@app.route("/api/social/category")
+def api_social_category():
+    return jsonify(get_social().category_page(request.args.get("name", "")))
 
 
 # ───────── Source-to-Sell fusion (trade x social) ─────────
@@ -156,6 +164,32 @@ TOOLS = [
         "description": "The fusion of TRADE + SOCIAL: 'Source-to-Sell' opportunities. Returns where to SOURCE (origin countries whose brands have social love, scored vs their cosmetics export strength), where to SELL (net-importer countries with unmet demand), and per-category source->sell routes. Use for 'where should I source/sell X' or any trade+social strategy question.",
         "input_schema": {"type": "object", "properties": {}},
     },
+    {
+        "name": "amazon_reviews",
+        "description": "Amazon review intelligence for a product category ('Sunscreen / SPF', 'Moisturizer & Hydration', or 'Cleanser & Oil Control'). Returns category avg rating, per-product ratings & aspect-level negative rates, the dominant pain points (sourcing opportunities), best-in-class product, and AI summaries. Use for product/quality/what-to-source questions.",
+        "input_schema": {
+            "type": "object",
+            "properties": {"category": {"type": "string"}},
+            "required": ["category"],
+        },
+    },
+    {
+        "name": "google_trends",
+        "description": "Google Trends search-interest for a product category ('Sunscreen / SPF', 'Moisturizer & Hydration', 'Cleanser & Oil Control') in markets HK and JP. Returns the category's trend (rising/stable/declining), 3-month momentum and YoY growth, rising sub-categories, and brand momentum per market. Use for demand-trend / market-timing / which-market questions.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "category": {"type": "string"},
+                "country": {"type": "string", "description": "Optional: 'HK' or 'JP'."},
+            },
+            "required": ["category"],
+        },
+    },
+    {
+        "name": "skin_type_segments",
+        "description": "US consumer skin-type distribution for OPPORTUNITY SEGMENTATION (Statista Consumer Insights). For each skin type (Normal, Dry, Sensitive, Oily, Combination, redness/dark-circles/allergy-prone) returns the approx % of US adults claiming it, the male vs female split (gender skew for targeting), and the linked product category. Use to size an addressable segment and decide who to target.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
 ]
 
 
@@ -185,6 +219,12 @@ def run_tool(name, args):
             return get_social().product_sentiment(args["name"])
         if name == "source_to_sell":
             return get_fusion().payload()
+        if name == "amazon_reviews":
+            return get_amazon().agent_summary(args["category"])
+        if name == "google_trends":
+            return get_trends().agent_summary(args["category"], args.get("country"))
+        if name == "skin_type_segments":
+            return skin_types.agent_summary()
     except Exception as e:  # noqa: BLE001
         return {"error": str(e)}
     return {"error": f"unknown tool {name}"}
@@ -194,6 +234,9 @@ SYSTEM = """You are the Product Scout AI, an analyst for cosmetics e-commerce th
 
 1. TRADE — official UN Comtrade customs statistics for HS 3304 (beauty & make-up preparations): country exports/imports, growth, corridors, regions. Tools: top_countries, country_profile, country_trend, trade_corridors, region_breakdown, list_available.
 2. SOCIAL — real consumer conversations (Reddit skincare communities): which products/ingredients people discuss and how they FEEL about them (VADER sentiment). Tools: social_search, social_overview, product_sentiment.
+3. AMAZON REVIEWS — for three categories (Sunscreen / SPF, Moisturizer & Hydration, Cleanser & Oil Control): per-product ratings and aspect-level negative rates (pain points = sourcing opportunities), best-in-class, AI summaries. Tool: amazon_reviews.
+4. GOOGLE TRENDS — search-interest momentum for those same three categories in Hong Kong (HK) and Japan (JP): category trend, 3-month momentum, YoY growth, rising sub-categories, brand momentum. Tool: google_trends. Note momentum/growth are ratios (0.10 = +10%); markets differ markedly (e.g., a category can be rising in JP while declining in HK).
+5. SKIN-TYPE SEGMENTS — US consumer skin-type distribution (Statista) for opportunity sizing: what share of adults claim each skin type, the male/female skew, and the linked product category. Tool: skin_type_segments. Use it to size an addressable segment (e.g. oily ~22% of US adults) and pick a target audience; the related_category links a segment to the trade/social/reviews/trends evidence.
 
 You MUST use tools to obtain any figure — never guess or recall numbers from memory. If a tool returns nothing, say so plainly.
 

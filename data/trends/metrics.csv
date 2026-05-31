@@ -1,0 +1,43 @@
+country,query_id,category,type,keyword,avg_score,peak_score,recent_mean,prior_mean,momentum_3m,momentum_6m,growth_yoy,trend_label,latest_date
+HK,cleanser_baseline,cleanser_oil_control,baseline,face wash,45.32,100.0,49.38,46.23,0.068,0.149,-0.03,stable,2025-12-28
+HK,cleanser_brands,cleanser_oil_control,brand,Laneige,49.53,76.0,49.15,47.46,0.036,-0.054,0.013,stable,2025-12-28
+HK,cleanser_brands,cleanser_oil_control,brand,CeraVe,64.6,100.0,67.46,66.46,0.015,0.047,0.026,stable,2025-12-28
+HK,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.63,66.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+HK,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,3.88,100.0,0.0,0.0,,-1.0,-0.29,insufficient data,2025-12-28
+HK,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+HK,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+HK,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,56.29,100.0,63.31,52.08,0.216,0.043,0.006,rising,2025-12-28
+HK,moisturizer_brands,moisturizer_hydration,brand,Laneige,49.53,76.0,49.15,47.46,0.036,-0.054,0.013,stable,2025-12-28
+HK,moisturizer_brands,moisturizer_hydration,brand,CeraVe,64.6,100.0,67.46,66.46,0.015,0.047,0.026,stable,2025-12-28
+HK,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,1.74,96.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+HK,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+HK,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,0.95,100.0,0.0,0.0,,-1.0,,insufficient data,2025-12-28
+HK,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+HK,sunscreen_brands,sunscreen_spf,brand,Laneige,49.53,76.0,49.15,47.46,0.036,-0.054,0.013,stable,2025-12-28
+HK,sunscreen_brands,sunscreen_spf,brand,CeraVe,64.6,100.0,67.46,66.46,0.015,0.047,0.026,stable,2025-12-28
+HK,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,52.65,100.0,44.85,63.15,-0.29,-0.055,0.108,declining,2025-12-28
+HK,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+HK,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,2.84,81.0,6.0,0.0,,-0.497,2.585,insufficient data,2025-12-28
+HK,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+HK,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,0.95,100.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+JP,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,6.48,73.0,35.23,4.62,6.633,6.507,5.312,rising,2025-12-28
+JP,cleanser_brands,cleanser_oil_control,brand,CeraVe,15.39,100.0,55.54,9.08,5.119,2.011,1.288,rising,2025-12-28
+JP,cleanser_baseline,cleanser_oil_control,baseline,face wash,18.62,100.0,59.38,11.85,4.013,1.309,1.154,rising,2025-12-28
+JP,cleanser_brands,cleanser_oil_control,brand,Laneige,15.71,38.0,23.38,15.08,0.551,0.114,0.383,rising,2025-12-28
+JP,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.27,28.0,2.15,0.0,,,,insufficient data,2025-12-28
+JP,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+JP,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,4.83,100.0,39.0,0.0,,,,insufficient data,2025-12-28
+JP,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,6.26,100.0,43.92,2.31,18.033,29.05,16.25,rising,2025-12-28
+JP,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,15.7,100.0,53.54,8.38,5.385,1.492,1.216,rising,2025-12-28
+JP,moisturizer_brands,moisturizer_hydration,brand,CeraVe,15.39,100.0,55.54,9.08,5.119,2.011,1.288,rising,2025-12-28
+JP,moisturizer_brands,moisturizer_hydration,brand,Laneige,15.71,38.0,23.38,15.08,0.551,0.114,0.383,rising,2025-12-28
+JP,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,2.71,53.0,21.92,0.0,,,,insufficient data,2025-12-28
+JP,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,1.89,38.0,15.23,0.0,,,,insufficient data,2025-12-28
+JP,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.26,27.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+JP,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,4.44,52.0,30.31,1.77,16.13,7.51,,rising,2025-12-28
+JP,sunscreen_brands,sunscreen_spf,brand,CeraVe,15.39,100.0,55.54,9.08,5.119,2.011,1.288,rising,2025-12-28
+JP,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,23.19,100.0,61.46,19.31,2.183,0.872,0.982,rising,2025-12-28
+JP,sunscreen_brands,sunscreen_spf,brand,Laneige,15.71,38.0,23.38,15.08,0.551,0.114,0.383,rising,2025-12-28
+JP,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,0.94,34.0,7.62,0.0,,,,insufficient data,2025-12-28
+JP,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,7.17,100.0,56.15,0.0,,30.739,,insufficient data,2025-12-28
+JP,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
