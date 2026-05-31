@@ -1,0 +1,6 @@
+flask>=3.0
+anthropic>=0.40
+pandas>=2.0
+requests>=2.31
+pycountry>=23.12
+pycountry-convert>=0.7
