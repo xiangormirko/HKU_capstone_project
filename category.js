@@ -15,6 +15,7 @@ const stars = r => { const n = Math.round(r || 0); return '★'.repeat(n) + '☆
 const negColor = v => v >= 40 ? '#EF4444' : v >= 25 ? '#F97316' : v >= 12 ? '#EAB308' : '#22C55E';
 
 window.openCategory = async function openCategory(name) {
+  window._currentCategory = name;
   const box = document.getElementById('socialCategory');
   document.getElementById('socialOverview').style.display = 'none';
   document.getElementById('socialResults').innerHTML = '';
@@ -167,11 +168,11 @@ function renderAspectChart(aspects) {
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderWidth: 1,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: cssVar('--c-tip-bg'), borderColor: cssVar('--c-tip-border'), borderWidth: 1,
         callbacks: { label: c => ` ${c.raw}% negative · ${data[c.dataIndex].mentions.toLocaleString()} mentions` } } },
       scales: {
-        x: { max: 100, grid: { color: 'rgba(226,232,240,.5)' }, ticks: { color: '#64748B', font: { size: 10 }, callback: v => v + '%' } },
-        y: { grid: { display: false }, ticks: { color: '#475569', font: { size: 11 } } },
+        x: { max: 100, grid: { color: cssVar('--c-grid') }, ticks: { color: cssVar('--c-axis'), font: { size: 10 }, callback: v => v + '%' } },
+        y: { grid: { display: false }, ticks: { color: cssVar('--c-axis'), font: { size: 11 } } },
       },
     },
   });
@@ -268,13 +269,13 @@ function renderTrendChart(series) {
       responsive: true, maintainAspectRatio: false, spanGaps: true,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { position: 'bottom', labels: { color: '#64748B', boxWidth: 12, font: { size: 10 }, padding: 8 } },
-        tooltip: { backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderWidth: 1,
+        legend: { position: 'bottom', labels: { color: cssVar('--c-axis'), boxWidth: 12, font: { size: 10 }, padding: 8 } },
+        tooltip: { backgroundColor: cssVar('--c-tip-bg'), borderColor: cssVar('--c-tip-border'), borderWidth: 1,
           callbacks: { label: c => ` ${c.dataset.label}: ${c.raw ?? '–'}/100` } },
       },
       scales: {
-        x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 9 }, maxTicksLimit: 9, autoSkip: true } },
-        y: { max: 100, grid: { color: 'rgba(226,232,240,.5)' }, ticks: { color: '#64748B', font: { size: 10 } } },
+        x: { grid: { display: false }, ticks: { color: cssVar('--c-axis'), font: { size: 9 }, maxTicksLimit: 9, autoSkip: true } },
+        y: { max: 100, grid: { color: cssVar('--c-grid') }, ticks: { color: cssVar('--c-axis'), font: { size: 10 } } },
       },
     },
   });

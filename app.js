@@ -73,8 +73,13 @@ function buildTable(tbodyId, data) {
 }
 
 // ───────────────────────── charts ─────────────────────────
-const axisColor = '#64748B';
-const gridColor = 'rgba(226,232,240,.5)';
+function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+let axisColor, gridColor, tipBg, tipText, tipBorder;
+function refreshChartTheme() {
+  axisColor = cssVar('--c-axis'); gridColor = cssVar('--c-grid');
+  tipBg = cssVar('--c-tip-bg'); tipText = cssVar('--c-tip-text'); tipBorder = cssVar('--c-tip-border');
+}
+refreshChartTheme();
 
 function destroy(id) { if (CHARTS[id]) { CHARTS[id].destroy(); delete CHARTS[id]; } }
 
@@ -92,8 +97,8 @@ function buildLineChart(canvasId, trendData, years) {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { position: 'bottom', labels: { color: axisColor, boxWidth: 12, padding: 10, font: { size: 10 } } },
-        tooltip: { mode: 'index', intersect: false, backgroundColor: '#FFFFFF', titleColor: '#1E293B',
-          bodyColor: axisColor, borderColor: '#E2E8F0', borderWidth: 1, padding: 10,
+        tooltip: { mode: 'index', intersect: false, backgroundColor: tipBg, titleColor: tipText,
+          bodyColor: axisColor, borderColor: tipBorder, borderWidth: 1, padding: 10,
           callbacks: { label: c => `${c.dataset.label}: $${(c.parsed.y ?? 0).toFixed(2)}B` } }
       },
       scales: {
@@ -117,7 +122,7 @@ function buildGlobalVolumeChart(vol) {
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { position: 'bottom', labels: { color: axisColor, boxWidth: 12, font: { size: 11 } } },
-        tooltip: { backgroundColor: '#FFFFFF', titleColor: '#1E293B', bodyColor: axisColor, borderColor: '#E2E8F0', borderWidth: 1,
+        tooltip: { backgroundColor: tipBg, titleColor: tipText, bodyColor: axisColor, borderColor: tipBorder, borderWidth: 1,
           callbacks: { label: c => `${c.dataset.label}: $${(c.parsed.y ?? 0).toFixed(1)}B` } } },
       scales: {
         x: { grid: { display: false }, ticks: { color: axisColor, font: { size: 11 } } },
@@ -139,7 +144,7 @@ function buildRegionGrowthChart(regions) {
       borderRadius: 6, barPercentage: .7 }] },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#FFFFFF', titleColor: '#1E293B', bodyColor: axisColor, borderColor: '#E2E8F0', borderWidth: 1,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: tipBg, titleColor: tipText, bodyColor: axisColor, borderColor: tipBorder, borderWidth: 1,
         callbacks: { label: c => c.parsed.x.toFixed(1) + '% CAGR' } } },
       scales: {
         x: { grid: { color: gridColor }, ticks: { color: axisColor, font: { size: 11 }, callback: v => v + '%' } },
@@ -159,7 +164,7 @@ function buildCorridorChart(corridors) {
         backgroundColor: corridors.map((_, i) => CHART_COLORS[i % CHART_COLORS.length] + 'cc'), borderRadius: 4, barPercentage: .75 }] },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#FFFFFF', titleColor: '#1E293B', bodyColor: axisColor, borderColor: '#E2E8F0', borderWidth: 1,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: tipBg, titleColor: tipText, bodyColor: axisColor, borderColor: tipBorder, borderWidth: 1,
         callbacks: { label: c => '$' + c.parsed.x.toFixed(2) + 'B' } } },
       scales: {
         x: { grid: { color: gridColor }, ticks: { color: axisColor, font: { size: 11 }, callback: v => '$' + v + 'B' }, beginAtZero: true },
@@ -224,16 +229,16 @@ async function buildMap(mapData) {
   const byId = new Map(mapData.map(d => [d.iso_numeric, d]));
   const totals = mapData.map(d => d.export_b + d.import_b).filter(v => v > 0);
   const maxTotal = d3.max(totals) || 1;
-  const color = d3.scaleSequentialSqrt(d3.interpolateRgb('#FFE9D5', '#EA580C')).domain([0, maxTotal]);
+  const color = d3.scaleSequentialSqrt(d3.interpolateRgb(cssVar('--c-map-lo'), cssVar('--c-map-hi'))).domain([0, maxTotal]);
 
   // ocean / sphere
-  svg.append('path').attr('d', path({ type: 'Sphere' })).attr('fill', '#EEF2F7').attr('stroke', '#E2E8F0');
+  svg.append('path').attr('d', path({ type: 'Sphere' })).attr('fill', cssVar('--c-map-ocean')).attr('stroke', cssVar('--c-map-stroke'));
 
   // countries
   svg.append('g').selectAll('path').data(features).join('path')
     .attr('d', path)
-    .attr('fill', f => { const d = byId.get(+f.id); return d ? color(d.export_b + d.import_b) : '#EAEEF4'; })
-    .attr('stroke', '#FFFFFF').attr('stroke-width', 0.4)
+    .attr('fill', f => { const d = byId.get(+f.id); return d ? color(d.export_b + d.import_b) : cssVar('--c-map-land'); })
+    .attr('stroke', cssVar('--c-map-border')).attr('stroke-width', 0.4)
     .style('cursor', f => byId.get(+f.id) ? 'pointer' : 'default')
     .on('mousemove', function (ev, f) {
       const d = byId.get(+f.id);
@@ -255,7 +260,7 @@ async function buildMap(mapData) {
     })
     .on('mouseleave', function () {
       document.getElementById('mapTooltip').classList.remove('visible');
-      d3.select(this).attr('stroke', '#FFFFFF').attr('stroke-width', 0.4);
+      d3.select(this).attr('stroke', cssVar('--c-map-border')).attr('stroke-width', 0.4);
     });
 
   // flow arcs for top corridors (centroids from geometry)
@@ -406,6 +411,29 @@ document.getElementById('aiClose').addEventListener('click', closeAI);
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && document.querySelector('.ai-panel').classList.contains('open')) closeAI();
 });
+
+// ───────────────────────── theme toggle (dark / light) ─────────────────────────
+const SUN_SVG = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M5 5l1.5 1.5M17.5 17.5L19 19M19 5l-1.5 1.5M6.5 17.5L5 19"/></svg>';
+const MOON_SVG = '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+function currentTheme() { return document.documentElement.getAttribute('data-theme') || 'light'; }
+function updateThemeIcon() {
+  const b = document.getElementById('themeToggle');
+  if (b) b.innerHTML = currentTheme() === 'dark' ? SUN_SVG : MOON_SVG;
+}
+function applyTheme(theme) {
+  document.documentElement.setAttribute('data-theme', theme);
+  try { localStorage.setItem('ps-theme', theme); } catch (e) {}
+  updateThemeIcon();
+  refreshChartTheme();
+  if (DATA) render(DATA);                                  // re-render trade charts + map
+  const catBox = document.getElementById('socialCategory');
+  if (window._currentCategory && catBox && catBox.style.display === 'block' && window.openCategory)
+    window.openCategory(window._currentCategory);          // re-render category charts
+  window.dispatchEvent(new Event('resize'));
+}
+document.getElementById('themeToggle').addEventListener('click',
+  () => applyTheme(currentTheme() === 'dark' ? 'light' : 'dark'));
+updateThemeIcon();
 
 // ───────────────────────── init ─────────────────────────
 (async function init() {
