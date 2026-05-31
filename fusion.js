@@ -29,12 +29,12 @@ function renderFusion(d) {
   // headline
   let html = '';
   if (d.headline) {
-    html += `<div class="fusion-headline"><span class="hl-ico">🎯</span><div>${esc(d.headline)}</div></div>`;
+    html += `<div class="fusion-headline"><span class="hl-ico"></span><div>${esc(d.headline)}</div></div>`;
   }
 
   // two columns: source | sell
   html += `<div class="fusion-cols"><div>
-    <div class="section-title"><div class="dot" style="background:var(--accent3)"></div> Where to SOURCE — origins shoppers love</div>`;
+    <div class="section-title"><div class="dot" style="background:var(--accent)"></div> Where to SOURCE — origins shoppers love</div>`;
   html += origins.map(o => {
     const ex = o.export_b != null ? `${sb(o.export_b)}${o.export_rank ? ' · #' + o.export_rank + ' exporter' : ''}` : 'n/a';
     const cagr = o.export_cagr != null ? `${o.export_cagr >= 0 ? '+' : ''}${o.export_cagr.toFixed(1)}%/yr` : '';
@@ -55,7 +55,7 @@ function renderFusion(d) {
   }).join('');
 
   html += `</div><div>
-    <div class="section-title"><div class="dot" style="background:var(--accent4)"></div> Where to SELL — unmet-demand markets</div>`;
+    <div class="section-title"><div class="dot" style="background:var(--accent)"></div> Where to SELL — unmet-demand markets</div>`;
   html += markets.map(m => `
     <div class="market-row">
       <div>
@@ -82,12 +82,12 @@ function renderFusion(d) {
       </div>
       <div class="route-flow">
         <div class="route-box">
-          <div class="rb-label">🏭 Source from</div>
+          <div class="rb-label">Source from</div>
           ${c.source_from.map(o => `<span class="chip-sm">${esc(o.origin)}${o.export_rank ? ' · #' + o.export_rank : ''}</span>`).join('') || '<span style="color:var(--text2);font-size:11px">—</span>'}
         </div>
         <div class="route-arrow">→</div>
         <div class="route-box">
-          <div class="rb-label">🛒 Sell to</div>
+          <div class="rb-label">Sell to</div>
           ${c.sell_to.map(s => `<span class="chip-sm">${esc(s.country)} · ${sb(s.net_import_b)}</span>`).join('')}
         </div>
       </div>

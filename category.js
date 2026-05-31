@@ -35,7 +35,7 @@ function renderCategoryPage(box, d) {
     <div class="cat-page-head">
       <h2>${esc(d.category)}</h2>
       <div class="cat-head-meta">
-        <span class="sub-badge">💬 ${(s.n_posts || 0)} Reddit posts</span>
+        <span class="sub-badge">${(s.n_posts || 0)} Reddit posts</span>
         <span class="sent-badge ${sentClass(s.sentiment_label)}">community mood: ${s.sentiment_label}</span>
       </div>
     </div>`;
@@ -55,7 +55,7 @@ function renderCategoryPage(box, d) {
 function amazonModule(a) {
   if (!a || !a.available) {
     return `<div class="module">
-      <div class="module-head"><h3>🛒 Amazon Reviews Intelligence</h3><span class="src-badge sample">not yet ingested</span></div>
+      <div class="module-head"><h3>Amazon Reviews Intelligence</h3><span class="src-badge sample">not yet ingested</span></div>
       <div style="color:var(--text2);font-size:13px">Amazon review data for this category has not been ingested yet. Live scraping &amp; ingestion is planned; the three seeded categories (Sunscreen / SPF, Moisturizer &amp; Hydration, Cleanser &amp; Oil Control) are available now.</div>
     </div>`;
   }
@@ -72,7 +72,7 @@ function amazonModule(a) {
 
   const callout = `
     <div class="insight-callout">
-      <div class="ic-title">📌 Sourcer insights · compiled from the reviews</div>
+      <div class="ic-title">Sourcer insights · compiled from the reviews</div>
       ${sm.insights.map(i => `<div class="ic-row"><span class="ic-tag ${i.tone}">${esc(i.tag)}</span><span>${i.text}</span></div>`).join('')}
     </div>`;
 
@@ -102,18 +102,18 @@ function amazonModule(a) {
   const voc = a.voice_of_customer;
   const quoteCard = (q, color) => `
     <div class="quote-card" style="--qc:${color}">
-      <div class="qc-top"><span class="qc-brand">${esc(q.brand)} ${'★'.repeat(q.rating || 0)}</span><span class="qc-meta">👍 ${q.helpful}${q.verified ? ' · verified' : ''}</span></div>
+      <div class="qc-top"><span class="qc-brand">${esc(q.brand)} ${'★'.repeat(q.rating || 0)}</span><span class="qc-meta">${q.helpful} helpful${q.verified ? ' · verified' : ''}</span></div>
       <div class="qc-text">“${esc(q.text)}”</div>
     </div>`;
   const vocBlock = `
     <div style="margin-top:20px">
       <div class="voc-grid">
         <div>
-          <div class="voc-col-label" style="color:var(--negative)">⚠ What buyers complain about</div>
+          <div class="voc-col-label" style="color:var(--negative)">What buyers complain about</div>
           ${voc.negative.map(q => quoteCard(q, 'var(--negative)')).join('') || '<div style="color:var(--text2);font-size:12px">No low-rating reviews in sample.</div>'}
         </div>
         <div>
-          <div class="voc-col-label" style="color:var(--positive)">★ What buyers love</div>
+          <div class="voc-col-label" style="color:var(--positive)">What buyers love</div>
           ${voc.positive.map(q => quoteCard(q, 'var(--positive)')).join('')}
         </div>
       </div>
@@ -128,7 +128,7 @@ function amazonModule(a) {
     <div class="amz-details" id="amzDetails" style="display:none">${table}${chart}${vocBlock}</div>`;
 
   return `<div class="module">
-    <div class="module-head"><h3>🛒 Amazon Reviews Intelligence</h3><span class="src-badge sample">${esc(a.meta.source)}</span></div>
+    <div class="module-head"><h3>Amazon Reviews Intelligence</h3><span class="src-badge sample">${esc(a.meta.source)}</span></div>
     ${summary}${callout}${toggle}
   </div>`;
 }
@@ -165,11 +165,11 @@ function renderAspectChart(aspects) {
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#121829', borderColor: '#232d45', borderWidth: 1,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderWidth: 1,
         callbacks: { label: c => ` ${c.raw}% negative · ${data[c.dataIndex].mentions.toLocaleString()} mentions` } } },
       scales: {
-        x: { max: 100, grid: { color: 'rgba(35,45,69,.5)' }, ticks: { color: '#8892b0', font: { size: 10 }, callback: v => v + '%' } },
-        y: { grid: { display: false }, ticks: { color: '#cdd3e0', font: { size: 11 } } },
+        x: { max: 100, grid: { color: 'rgba(226,232,240,.5)' }, ticks: { color: '#64748B', font: { size: 10 }, callback: v => v + '%' } },
+        y: { grid: { display: false }, ticks: { color: '#475569', font: { size: 11 } } },
       },
     },
   });
@@ -185,12 +185,12 @@ const pct = x => x == null ? '—' : (x >= 0 ? '+' : '') + Math.round(x * 100) +
 function trendsModule(t) {
   if (!t || !t.available) {
     return `<div class="module">
-      <div class="module-head"><h3>🔍 Google Trends — search interest</h3><span class="src-badge sample">no data yet</span></div>
+      <div class="module-head"><h3>Google Trends — search interest</h3><span class="src-badge sample">no data yet</span></div>
       <div style="color:var(--text2);font-size:13px">Google Trends data is available for the three seeded categories (Sunscreen / SPF, Moisturizer &amp; Hydration, Cleanser &amp; Oil Control).</div>
     </div>`;
   }
   return `<div class="module">
-    <div class="module-head"><h3>🔍 Google Trends — search interest</h3><span class="src-badge">${esc(t.source)} · to ${esc(t.latest_date)}</span></div>
+    <div class="module-head"><h3>Google Trends — search interest</h3><span class="src-badge">${esc(t.source)} · to ${esc(t.latest_date)}</span></div>
     <div class="trend-tabs" id="trendCountryTabs">
       ${t.countries.map(c => `<button class="tcountry ${c.code === t.default_country ? 'active' : ''}" data-c="${c.code}">${FLAG[c.code] || ''} ${esc(c.name)}</button>`).join('')}
     </div>
@@ -231,18 +231,18 @@ function renderTrendCountry(t, code) {
     <div class="amz-chart-wrap" style="height:240px"><canvas id="trendsChart"></canvas></div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:16px">
       <div>
-        <div class="voc-col-label">📈 Rising sub-categories <span style="font-weight:400;color:var(--text2)">(3-mo momentum)</span></div>
+        <div class="voc-col-label">Rising sub-categories <span style="font-weight:400;color:var(--text2)">(3-mo momentum)</span></div>
         ${cb.rising_subcategories.length ? cb.rising_subcategories.map(subRow).join('') : '<div style="color:var(--text2);font-size:12px">No sub-category signal.</div>'}
       </div>
       <div>
-        <div class="voc-col-label">🏷 Brand momentum</div>
+        <div class="voc-col-label">Brand momentum</div>
         ${cb.brands.map(brandRow).join('')}
       </div>
     </div>`;
   renderTrendChart(cb.series);
 }
 
-const TREND_LINE_COLORS = ['#6c5ce7', '#00cec9', '#fd79a8', '#fdcb6e'];
+const TREND_LINE_COLORS = ['#F97316', '#0EA5E9', '#EC4899', '#F59E0B'];
 function renderTrendChart(series) {
   const el = document.getElementById('trendsChart');
   if (!el || !series) return;
@@ -257,7 +257,7 @@ function renderTrendChart(series) {
         label: ln.name + (ln.role === 'category' ? ' (category)' : ''),
         data: ln.values,
         borderColor: TREND_LINE_COLORS[i % TREND_LINE_COLORS.length],
-        backgroundColor: ln.role === 'category' ? 'rgba(108,92,231,.12)' : 'transparent',
+        backgroundColor: ln.role === 'category' ? 'rgba(249,115,22,.12)' : 'transparent',
         fill: ln.role === 'category', borderWidth: ln.role === 'category' ? 2.5 : 1.6,
         tension: 0.3, pointRadius: 0, pointHoverRadius: 3, borderDash: ln.role === 'brand' ? [4, 3] : [],
       })),
@@ -266,13 +266,13 @@ function renderTrendChart(series) {
       responsive: true, maintainAspectRatio: false, spanGaps: true,
       interaction: { mode: 'index', intersect: false },
       plugins: {
-        legend: { position: 'bottom', labels: { color: '#8892b0', boxWidth: 12, font: { size: 10 }, padding: 8 } },
-        tooltip: { backgroundColor: '#121829', borderColor: '#232d45', borderWidth: 1,
+        legend: { position: 'bottom', labels: { color: '#64748B', boxWidth: 12, font: { size: 10 }, padding: 8 } },
+        tooltip: { backgroundColor: '#FFFFFF', borderColor: '#E2E8F0', borderWidth: 1,
           callbacks: { label: c => ` ${c.dataset.label}: ${c.raw ?? '–'}/100` } },
       },
       scales: {
-        x: { grid: { display: false }, ticks: { color: '#8892b0', font: { size: 9 }, maxTicksLimit: 9, autoSkip: true } },
-        y: { max: 100, grid: { color: 'rgba(35,45,69,.5)' }, ticks: { color: '#8892b0', font: { size: 10 } } },
+        x: { grid: { display: false }, ticks: { color: '#64748B', font: { size: 9 }, maxTicksLimit: 9, autoSkip: true } },
+        y: { max: 100, grid: { color: 'rgba(226,232,240,.5)' }, ticks: { color: '#64748B', font: { size: 10 } } },
       },
     },
   });
@@ -287,13 +287,13 @@ function redditModule(r) {
       <div class="rc-title" style="font-size:14px">${p.permalink ? `<a href="${esc(p.permalink)}" target="_blank" rel="noopener">${esc(p.title)}</a>` : esc(p.title)}</div>
       <div class="rc-sub">
         <span class="sub-badge">r/${esc(p.subreddit)}</span>
-        <span>💬 ${p.n_comments}</span>
+        <span>${p.n_comments}</span>
         <span class="sent-badge ${sentClass(p.post_sentiment_label)}">${p.post_sentiment_label}</span>
-        ${p.brands.slice(0, 3).map(b => `<span class="tag brand">🏷 ${esc(b)}</span>`).join('')}
+        ${p.brands.slice(0, 3).map(b => `<span class="tag brand">${esc(b)}</span>`).join('')}
       </div>
     </div>`).join('');
   return `<div class="module">
-    <div class="module-head"><h3>💬 Reddit conversation</h3><span class="src-badge">r/skincare communities · VADER sentiment</span></div>
+    <div class="module-head"><h3>Reddit conversation</h3><span class="src-badge">r/skincare communities · VADER sentiment</span></div>
     <div style="font-size:12px;color:var(--text2);margin-bottom:12px">Overall community mood for this category: <span class="${sentClass(sum.sentiment_label)}">${sum.sentiment_label || 'n/a'}</span> across the matched discussion. Top products mentioned: ${(sum.top_products || []).slice(0, 4).map(p => esc(p.name)).join(', ') || '—'}.</div>
     ${posts}
   </div>`;

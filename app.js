@@ -5,8 +5,8 @@
 // Claude agent (/api/chat) that has tool access to the same dataset.
 // ════════════════════════════════════════════════════════════════
 
-const CHART_COLORS = ['#6c5ce7','#a29bfe','#00cec9','#fd79a8','#fdcb6e',
-                      '#e17055','#00b894','#74b9ff','#636e72','#b2bec3'];
+const CHART_COLORS = ['#F97316','#FB923C','#0EA5E9','#EC4899','#F59E0B',
+                      '#FB7185','#16A34A','#38BDF8','#94A3B8','#CBD5E1'];
 const fmtB = v => (v == null ? 'N/A' : '$' + Number(v).toFixed(2) + 'B');
 
 let DATA = null;          // current payload
@@ -73,8 +73,8 @@ function buildTable(tbodyId, data) {
 }
 
 // ───────────────────────── charts ─────────────────────────
-const axisColor = '#8892b0';
-const gridColor = 'rgba(35,45,69,.5)';
+const axisColor = '#64748B';
+const gridColor = 'rgba(226,232,240,.5)';
 
 function destroy(id) { if (CHARTS[id]) { CHARTS[id].destroy(); delete CHARTS[id]; } }
 
@@ -92,8 +92,8 @@ function buildLineChart(canvasId, trendData, years) {
       responsive: true, maintainAspectRatio: false,
       plugins: {
         legend: { position: 'bottom', labels: { color: axisColor, boxWidth: 12, padding: 10, font: { size: 10 } } },
-        tooltip: { mode: 'index', intersect: false, backgroundColor: '#121829', titleColor: '#e8eaf0',
-          bodyColor: axisColor, borderColor: '#232d45', borderWidth: 1, padding: 10,
+        tooltip: { mode: 'index', intersect: false, backgroundColor: '#FFFFFF', titleColor: '#1E293B',
+          bodyColor: axisColor, borderColor: '#E2E8F0', borderWidth: 1, padding: 10,
           callbacks: { label: c => `${c.dataset.label}: $${(c.parsed.y ?? 0).toFixed(2)}B` } }
       },
       scales: {
@@ -111,13 +111,13 @@ function buildGlobalVolumeChart(vol) {
   CHARTS['globalVolumeChart'] = new Chart(ctx, {
     type: 'bar',
     data: { labels: vol.years, datasets: [
-      { label: 'Exports', data: vol.exports, backgroundColor: '#6c5ce7cc', borderRadius: 4, barPercentage: .7 },
-      { label: 'Imports', data: vol.imports, backgroundColor: '#fd79a8cc', borderRadius: 4, barPercentage: .7 },
+      { label: 'Exports', data: vol.exports, backgroundColor: '#F97316cc', borderRadius: 4, barPercentage: .7 },
+      { label: 'Imports', data: vol.imports, backgroundColor: '#EC4899cc', borderRadius: 4, barPercentage: .7 },
     ] },
     options: {
       responsive: true, maintainAspectRatio: false,
       plugins: { legend: { position: 'bottom', labels: { color: axisColor, boxWidth: 12, font: { size: 11 } } },
-        tooltip: { backgroundColor: '#121829', titleColor: '#e8eaf0', bodyColor: axisColor, borderColor: '#232d45', borderWidth: 1,
+        tooltip: { backgroundColor: '#FFFFFF', titleColor: '#1E293B', bodyColor: axisColor, borderColor: '#E2E8F0', borderWidth: 1,
           callbacks: { label: c => `${c.dataset.label}: $${(c.parsed.y ?? 0).toFixed(1)}B` } } },
       scales: {
         x: { grid: { display: false }, ticks: { color: axisColor, font: { size: 11 } } },
@@ -135,11 +135,11 @@ function buildRegionGrowthChart(regions) {
     type: 'bar',
     data: { labels: data.map(r => r.region), datasets: [{
       data: data.map(r => r.cagr_pct),
-      backgroundColor: data.map(r => r.cagr_pct > 9 ? '#00cec9cc' : r.cagr_pct > 4 ? '#6c5ce7cc' : r.cagr_pct >= 0 ? '#a29bfecc' : '#d63031cc'),
+      backgroundColor: data.map(r => r.cagr_pct > 9 ? '#0EA5E9cc' : r.cagr_pct > 4 ? '#F97316cc' : r.cagr_pct >= 0 ? '#FB923Ccc' : '#EF4444cc'),
       borderRadius: 6, barPercentage: .7 }] },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#121829', titleColor: '#e8eaf0', bodyColor: axisColor, borderColor: '#232d45', borderWidth: 1,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#FFFFFF', titleColor: '#1E293B', bodyColor: axisColor, borderColor: '#E2E8F0', borderWidth: 1,
         callbacks: { label: c => c.parsed.x.toFixed(1) + '% CAGR' } } },
       scales: {
         x: { grid: { color: gridColor }, ticks: { color: axisColor, font: { size: 11 }, callback: v => v + '%' } },
@@ -159,7 +159,7 @@ function buildCorridorChart(corridors) {
         backgroundColor: corridors.map((_, i) => CHART_COLORS[i % CHART_COLORS.length] + 'cc'), borderRadius: 4, barPercentage: .75 }] },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#121829', titleColor: '#e8eaf0', bodyColor: axisColor, borderColor: '#232d45', borderWidth: 1,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: '#FFFFFF', titleColor: '#1E293B', bodyColor: axisColor, borderColor: '#E2E8F0', borderWidth: 1,
         callbacks: { label: c => '$' + c.parsed.x.toFixed(2) + 'B' } } },
       scales: {
         x: { grid: { color: gridColor }, ticks: { color: axisColor, font: { size: 11 }, callback: v => '$' + v + 'B' }, beginAtZero: true },
@@ -181,7 +181,7 @@ function buildBilateralMatrix(bil) {
     html += `<tr><th style="text-align:right;padding-right:10px">${row}</th>`;
     countries.forEach((col, ci) => {
       const v = M[ri][ci];
-      if (v == null) { html += '<td style="background:#1a2236;color:#3a4260">—</td>'; return; }
+      if (v == null) { html += '<td style="background:#F4F6FA;color:#94A3B8">—</td>'; return; }
       const t = v / maxVal;
       const r = Math.round(108 + (253 - 108) * t);
       const g = Math.round(92 + (121 - 92) * t * (t < .5 ? 1 : .3));
@@ -224,16 +224,16 @@ async function buildMap(mapData) {
   const byId = new Map(mapData.map(d => [d.iso_numeric, d]));
   const totals = mapData.map(d => d.export_b + d.import_b).filter(v => v > 0);
   const maxTotal = d3.max(totals) || 1;
-  const color = d3.scaleSequentialSqrt(d3.interpolateRgb('#1a2236', '#a29bfe')).domain([0, maxTotal]);
+  const color = d3.scaleSequentialSqrt(d3.interpolateRgb('#FFE9D5', '#EA580C')).domain([0, maxTotal]);
 
   // ocean / sphere
-  svg.append('path').attr('d', path({ type: 'Sphere' })).attr('fill', '#0d1322').attr('stroke', '#1a2236');
+  svg.append('path').attr('d', path({ type: 'Sphere' })).attr('fill', '#EEF2F7').attr('stroke', '#E2E8F0');
 
   // countries
   svg.append('g').selectAll('path').data(features).join('path')
     .attr('d', path)
-    .attr('fill', f => { const d = byId.get(+f.id); return d ? color(d.export_b + d.import_b) : '#141a2c'; })
-    .attr('stroke', '#0b0f1a').attr('stroke-width', 0.4)
+    .attr('fill', f => { const d = byId.get(+f.id); return d ? color(d.export_b + d.import_b) : '#EAEEF4'; })
+    .attr('stroke', '#FFFFFF').attr('stroke-width', 0.4)
     .style('cursor', f => byId.get(+f.id) ? 'pointer' : 'default')
     .on('mousemove', function (ev, f) {
       const d = byId.get(+f.id);
@@ -255,20 +255,20 @@ async function buildMap(mapData) {
     })
     .on('mouseleave', function () {
       document.getElementById('mapTooltip').classList.remove('visible');
-      d3.select(this).attr('stroke', '#0b0f1a').attr('stroke-width', 0.4);
+      d3.select(this).attr('stroke', '#FFFFFF').attr('stroke-width', 0.4);
     });
 
   // flow arcs for top corridors (centroids from geometry)
   const centroidById = new Map();
   features.forEach(f => centroidById.set(+f.id, projection(d3.geoCentroid(f))));
-  flow.append('defs').html('<marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="rgba(162,155,254,.8)"/></marker>');
+  flow.append('defs').html('<marker id="arrowhead" markerWidth="6" markerHeight="6" refX="5" refY="2" orient="auto"><path d="M0,0 L6,2 L0,4" fill="rgba(251,146,60,.8)"/></marker>');
   const maxFlow = d3.max(DATA.corridors, c => c.value_b) || 1;
   DATA.corridors.slice(0, 8).forEach(c => {
     const a = centroidById.get(c.from_iso), b = centroidById.get(c.to_iso);
     if (!a || !b) return;
     const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2 - Math.abs(b[0] - a[0]) * 0.18 - 20;
     flow.append('path').attr('d', `M${a[0]},${a[1]} Q${mx},${my} ${b[0]},${b[1]}`)
-      .attr('fill', 'none').attr('stroke', 'rgba(108,92,231,0.55)')
+      .attr('fill', 'none').attr('stroke', 'rgba(249,115,22,0.55)')
       .attr('stroke-width', 0.8 + (c.value_b / maxFlow) * 3.5)
       .attr('marker-end', 'url(#arrowhead)').attr('opacity', 0.85);
     flow.append('circle').attr('cx', a[0]).attr('cy', a[1]).attr('r', 2.5).attr('fill', 'var(--accent)');

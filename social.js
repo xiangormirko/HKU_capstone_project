@@ -43,7 +43,7 @@ async function loadSocialOverview() {
 
   // example chips
   document.getElementById('exampleChips').innerHTML =
-    SOCIAL_OV.example_queries.map(q => `<div class="chip" data-q="${esc(q)}">🔍 ${esc(q)}</div>`).join('');
+    SOCIAL_OV.example_queries.map(q => `<div class="chip" data-q="${esc(q)}">${esc(q)}</div>`).join('');
   document.querySelectorAll('#exampleChips .chip').forEach(c =>
     c.addEventListener('click', () => runSearch(c.dataset.q)));
 
@@ -73,7 +73,7 @@ function renderInsights(ins) {
     <div class="insights-panel">
       <div class="insights-head">
         <div>
-          <h3>🚀 Launch Opportunities</h3>
+          <h3>Launch Opportunities</h3>
           <p>Trending categories ranked by conversation volume and unmet need — where social demand signals a clear opening to launch new products.</p>
         </div>
         <div class="insights-stats">
@@ -113,10 +113,10 @@ function renderOverview() {
 
     ${renderInsights(ov.insights)}
 
-    <div class="section-title" style="margin-top:28px"><div class="dot" style="background:var(--accent3)"></div> Most-discussed products</div>
+    <div class="section-title" style="margin-top:28px"><div class="dot" style="background:var(--accent)"></div> Most-discussed products</div>
     <div class="ent-list">${ov.top_brands.map(b => pill(b.entity, label(b.avg_sentiment))).join('')}</div>
 
-    <div class="section-title" style="margin-top:24px"><div class="dot" style="background:var(--accent4)"></div> Trending ingredients</div>
+    <div class="section-title" style="margin-top:24px"><div class="dot" style="background:var(--accent)"></div> Trending ingredients</div>
     <div class="ent-list">${ov.top_ingredients.map(i => pill(i.entity, label(i.avg_sentiment))).join('')}</div>`;
 
   // category cards & launch-opportunity CTAs open the category detail page;
@@ -176,8 +176,8 @@ async function runSearch(q) {
 function tagRow(p) {
   const t = [];
   p.categories.slice(0, 4).forEach(c => t.push(`<span class="tag cat">${esc(c)}</span>`));
-  p.brands.slice(0, 4).forEach(b => t.push(`<span class="tag brand">🏷 ${esc(b)}</span>`));
-  p.ingredients.slice(0, 4).forEach(i => t.push(`<span class="tag ing">🧪 ${esc(i)}</span>`));
+  p.brands.slice(0, 4).forEach(b => t.push(`<span class="tag brand">${esc(b)}</span>`));
+  p.ingredients.slice(0, 4).forEach(i => t.push(`<span class="tag ing">${esc(i)}</span>`));
   return t.join('');
 }
 
@@ -235,7 +235,7 @@ function renderResults(data) {
             <div class="rc-title">${link}</div>
             <div class="rc-sub">
               <span class="sub-badge">r/${esc(p.subreddit)}</span>
-              <span>💬 ${p.n_comments} comments</span>
+              <span>${p.n_comments} comments</span>
               ${sentBadge(p.post_sentiment, p.post_sentiment_label, 'post:')}
               ${sentBadge(p.discussion_sentiment, p.discussion_label, 'discussion:')}
             </div>
