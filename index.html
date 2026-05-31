@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Global Cosmetics Trade Intelligence — HS 3304</title>
+<title>Product Scout — Trade & Social Discovery</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 <script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
@@ -305,12 +305,180 @@
   /* ── Fullwidth sections ── */
   .full-row { grid-column: 1 / -1; }
 
+  /* ── Top feature menu bar ── */
+  .main-nav { display:flex; gap:6px; }
+  .nav-item {
+    display:flex; align-items:center; gap:8px; padding:9px 16px; border-radius:10px;
+    background:transparent; border:1px solid transparent; color:var(--text2);
+    font-size:13px; font-weight:600; cursor:pointer; transition:.2s;
+  }
+  .nav-item .nav-ico { font-size:16px; }
+  .nav-item:hover { color:var(--text); background:var(--surface2); }
+  .nav-item.active { color:#fff; background:linear-gradient(135deg, var(--accent), var(--accent4)); border-color:transparent; }
+  .nav-item small { display:block; font-size:10px; font-weight:400; opacity:.8; }
+
+  /* ── Views ── */
+  .view { display:none; }
+  .view.active { display:block; }
+
+  /* ── Social discovery ── */
+  .social-wrap { padding:24px 32px; max-width:1200px; margin:0 auto; }
+  .social-hero { text-align:center; padding:18px 0 8px; }
+  .social-hero h2 { font-size:24px; font-weight:700; letter-spacing:-.4px; }
+  .social-hero p { color:var(--text2); font-size:13px; margin-top:6px; }
+  .search-row { display:flex; gap:10px; max-width:680px; margin:18px auto 10px; }
+  .social-search {
+    flex:1; background:var(--surface); border:1px solid var(--border); border-radius:12px;
+    padding:14px 18px; color:var(--text); font-size:15px; outline:none;
+  }
+  .social-search:focus { border-color:var(--accent); }
+  .search-btn {
+    background:linear-gradient(135deg, var(--accent), var(--accent4)); border:none; color:#fff;
+    padding:0 24px; border-radius:12px; font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:6px auto 4px; max-width:760px; }
+  .chip {
+    font-size:12px; color:var(--accent2); background:rgba(108,92,231,.1);
+    border:1px solid rgba(108,92,231,.25); border-radius:20px; padding:6px 13px; cursor:pointer; transition:.2s;
+  }
+  .chip:hover { background:rgba(108,92,231,.2); border-color:var(--accent); }
+
+  /* summary strip */
+  .summary-strip {
+    display:grid; grid-template-columns:auto 1fr 1fr; gap:16px; margin:22px 0 18px;
+    background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px;
+  }
+  .summary-strip .blk-label { font-size:11px; text-transform:uppercase; letter-spacing:.6px; color:var(--text2); margin-bottom:8px; }
+  .big-sent { font-size:26px; font-weight:700; }
+  .product-pill {
+    display:inline-flex; align-items:center; gap:6px; font-size:12px; margin:3px 4px 3px 0;
+    background:var(--surface2); border:1px solid var(--border); border-radius:16px; padding:5px 11px;
+  }
+  .product-pill .dot { width:7px; height:7px; border-radius:50%; }
+
+  /* sentiment colors */
+  .sent-pos { color:var(--positive); } .sent-neg { color:var(--negative); } .sent-neu { color:var(--warning); }
+  .dot.sent-pos { background:var(--positive); } .dot.sent-neg { background:var(--negative); } .dot.sent-neu { background:var(--warning); }
+  .sent-badge { font-size:11px; font-weight:600; padding:3px 9px; border-radius:12px; }
+  .sent-badge.sent-pos { background:rgba(0,184,148,.15); } .sent-badge.sent-neg { background:rgba(214,48,49,.15); } .sent-badge.sent-neu { background:rgba(253,203,110,.15); }
+
+  /* result cards */
+  .result-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:18px; margin-bottom:14px; }
+  .result-card:hover { border-color:var(--accent); }
+  .rc-head { display:flex; justify-content:space-between; align-items:start; gap:12px; }
+  .rc-title { font-size:15px; font-weight:600; line-height:1.4; }
+  .rc-title a { color:var(--text); text-decoration:none; }
+  .rc-title a:hover { color:var(--accent2); }
+  .rc-sub { font-size:11px; color:var(--text2); margin-top:4px; display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+  .sub-badge { background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:2px 8px; }
+  .rc-snippet { font-size:13px; color:var(--text2); line-height:1.55; margin:10px 0; }
+  .rc-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:6px; }
+  .tag { font-size:11px; border-radius:8px; padding:3px 9px; }
+  .tag.cat { background:rgba(108,92,231,.12); color:var(--accent2); }
+  .tag.brand { background:rgba(0,206,201,.12); color:var(--accent3); }
+  .tag.ing { background:rgba(253,121,168,.12); color:var(--accent4); }
+  .rc-comment { background:var(--surface2); border-left:3px solid var(--border); border-radius:8px; padding:10px 12px; margin-top:12px; font-size:12px; color:var(--text2); line-height:1.5; }
+  .rc-comment .cm-meta { font-size:10px; margin-top:6px; opacity:.8; }
+
+  /* home / back button */
+  .home-btn {
+    display:inline-flex; align-items:center; gap:7px; background:var(--surface); color:var(--text2);
+    border:1px solid var(--border); border-radius:10px; padding:9px 16px; font-size:13px;
+    font-weight:600; cursor:pointer; transition:.2s; margin-bottom:16px;
+  }
+  .home-btn:hover { color:#fff; background:var(--surface2); border-color:var(--accent); }
+
+  /* launch-opportunity insights */
+  .insights-panel {
+    background:linear-gradient(135deg, rgba(108,92,231,.12), rgba(253,121,168,.08));
+    border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin:22px 0 6px;
+  }
+  .insights-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; flex-wrap:wrap; margin-bottom:16px; }
+  .insights-head h3 { font-size:17px; font-weight:700; display:flex; align-items:center; gap:8px; }
+  .insights-head p { font-size:12px; color:var(--text2); margin-top:4px; max-width:520px; }
+  .insights-stats { display:flex; gap:22px; }
+  .insights-stats .stat { text-align:right; }
+  .insights-stats .stat .v { font-size:20px; font-weight:700; }
+  .insights-stats .stat .l { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.5px; }
+  .opp-cards { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:14px; }
+  .opp-launch {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .opp-launch .tag-angle {
+    align-self:flex-start; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;
+    padding:3px 9px; border-radius:10px;
+  }
+  .tag-angle.whitespace { background:rgba(253,203,110,.18); color:var(--warning); }
+  .tag-angle.differentiate { background:rgba(0,206,201,.15); color:var(--accent3); }
+  .tag-angle.validated { background:rgba(0,184,148,.15); color:var(--positive); }
+  .opp-launch h4 { font-size:15px; font-weight:600; }
+  .opp-launch .meta { font-size:11px; color:var(--text2); }
+  .opp-launch .why { font-size:12px; color:var(--text2); line-height:1.5; flex:1; }
+  .opp-launch .incumbents { font-size:11px; color:var(--text2); }
+  .cta-btn {
+    margin-top:4px; align-self:flex-start; background:linear-gradient(135deg, var(--accent), var(--accent4));
+    border:none; color:#fff; padding:8px 14px; border-radius:9px; font-size:12px; font-weight:600; cursor:pointer; transition:.2s;
+  }
+  .cta-btn:hover { filter:brightness(1.12); transform:translateX(2px); }
+
+  /* ── Source-to-Sell fusion ── */
+  .fusion-headline {
+    background:linear-gradient(135deg, rgba(0,206,201,.14), rgba(108,92,231,.12));
+    border:1px solid var(--border); border-radius:var(--radius); padding:18px 20px; margin:18px 0;
+    font-size:14px; line-height:1.6; display:flex; gap:12px; align-items:flex-start;
+  }
+  .fusion-headline .hl-ico { font-size:22px; }
+  .fusion-cols { display:grid; grid-template-columns:1.2fr 1fr; gap:18px; margin-top:6px; }
+  .origin-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:15px; margin-bottom:12px;
+  }
+  .origin-card .oc-head { display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+  .origin-card .oc-name { font-size:15px; font-weight:700; }
+  .origin-card .oc-tag { font-size:11px; color:var(--accent3); font-weight:600; }
+  .origin-card .oc-signal { font-size:11px; padding:3px 9px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); white-space:nowrap; }
+  .origin-card .oc-stats { display:flex; gap:18px; margin:10px 0; flex-wrap:wrap; }
+  .origin-card .oc-stat .v { font-size:16px; font-weight:700; }
+  .origin-card .oc-stat .l { font-size:10px; color:var(--text2); text-transform:uppercase; letter-spacing:.4px; }
+  .origin-card .oc-brands { font-size:11px; color:var(--text2); }
+  .bar-track { height:5px; background:var(--surface2); border-radius:3px; overflow:hidden; margin-top:9px; }
+  .bar-fill { height:100%; border-radius:3px; background:linear-gradient(90deg,var(--accent3),var(--accent)); }
+
+  .market-row {
+    display:flex; align-items:center; justify-content:space-between; gap:10px;
+    background:var(--surface); border:1px solid var(--border); border-radius:9px; padding:11px 13px; margin-bottom:9px;
+  }
+  .market-row .mr-name { font-size:13px; font-weight:600; }
+  .market-row .mr-sub { font-size:10px; color:var(--text2); }
+  .market-row .mr-net { font-size:15px; font-weight:700; color:var(--accent4); text-align:right; }
+  .market-row .mr-yoy { font-size:10px; }
+
+  .route-card {
+    background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; margin-bottom:12px;
+  }
+  .route-head { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+  .route-head h4 { font-size:15px; font-weight:600; }
+  .route-flow { display:grid; grid-template-columns:1fr auto 1fr; gap:12px; align-items:center; }
+  .route-box { background:var(--surface2); border:1px solid var(--border); border-radius:9px; padding:11px; }
+  .route-box .rb-label { font-size:10px; text-transform:uppercase; letter-spacing:.5px; color:var(--text2); margin-bottom:7px; }
+  .route-box .chip-sm { display:inline-block; font-size:11px; background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:3px 8px; margin:2px 3px 2px 0; }
+  .route-arrow { font-size:22px; color:var(--accent); }
+
+  /* overview grid */
+  .ov-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); gap:14px; margin-top:14px; }
+  .ov-card { background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); padding:16px; cursor:pointer; transition:.2s; }
+  .ov-card:hover { border-color:var(--accent); transform:translateY(-2px); }
+  .ov-card h4 { font-size:14px; font-weight:600; margin-bottom:6px; }
+  .ov-meta { font-size:11px; color:var(--text2); display:flex; justify-content:space-between; }
+  .ent-list { display:flex; flex-wrap:wrap; gap:7px; }
+
   /* ── Responsive ── */
   @media (max-width:1200px) {
     .dashboard { grid-template-columns:1fr; }
     .ai-panel { height:500px; position:relative; top:0; }
     .kpi-row { grid-template-columns:repeat(2,1fr); }
     .chart-grid { grid-template-columns:1fr; }
+    .summary-strip { grid-template-columns:1fr; }
   }
 </style>
 </head>
@@ -319,24 +487,39 @@
 <!-- ═══════════ HEADER ═══════════ -->
 <header>
   <div class="logo">
-    <div class="logo-icon">CT</div>
+    <div class="logo-icon">PS</div>
     <div>
-      <h1>CosmoTrade Intelligence</h1>
-      <span>Global Cosmetics Trade Analytics Platform</span>
+      <h1>Product Scout</h1>
+      <span>Global Trade &amp; Social Discovery for Cosmetics</span>
     </div>
   </div>
-  <div class="header-controls">
+
+  <!-- ═══ Core feature menu bar ═══ -->
+  <nav class="main-nav" id="mainNav">
+    <button class="nav-item active" data-view="trade">
+      <span class="nav-ico">🌐</span>
+      <span>Trade Intelligence<small>Global import/export flows</small></span>
+    </button>
+    <button class="nav-item" data-view="social">
+      <span class="nav-ico">💬</span>
+      <span>Social Discovery<small>Sentiment &amp; product trends</small></span>
+    </button>
+    <button class="nav-item" data-view="fusion">
+      <span class="nav-ico">🎯</span>
+      <span>Source-to-Sell<small>Where demand meets trade</small></span>
+    </button>
+  </nav>
+
+  <div class="header-controls" id="tradeControls">
     <div class="hs-badge">HS 3304 — Beauty/Makeup Preparations</div>
     <select class="year-select" id="yearSelect">
-      <option value="2025" selected>2025</option>
-      <option value="2024">2024</option>
-      <option value="2023">2023</option>
-      <option value="2022">2022</option>
-      <option value="2021">2021</option>
+      <option value="2024" selected>2024</option>
     </select>
   </div>
 </header>
 
+<!-- ═══════════ VIEW: TRADE INTELLIGENCE ═══════════ -->
+<div id="view-trade" class="view active">
 <div class="dashboard">
 <!-- ═══════════ MAIN CONTENT ═══════════ -->
 <div class="main-content">
@@ -479,31 +662,30 @@
   <div class="ai-header">
     <div class="ai-icon">&#10024;</div>
     <div class="ai-header-text">
-      <h3>Trade Analyst AI</h3>
-      <span>Ask anything about HS 3304 cosmetics trade</span>
+      <h3>Product Scout AI</h3>
+      <span>Trade data + social sentiment, together</span>
     </div>
   </div>
 
   <div class="ai-messages" id="aiMessages">
     <div class="ai-msg assistant">
-      Welcome! I'm your AI trade analyst specializing in <strong>HS 3304 — Beauty &amp; Makeup Preparations</strong>. I can help you:
+      Hi! I'm <strong>Product Scout AI</strong>. I can reason across <strong>two real datasets</strong> at once:
       <br><br>
-      &#8226; Identify high-growth import markets<br>
-      &#8226; Find underserved trade corridors<br>
-      &#8226; Analyze competitor country positioning<br>
-      &#8226; Spot seasonal and trend-based opportunities
+      &#127760; <strong>Trade</strong> — UN Comtrade HS 3304 exports/imports, growth, corridors<br>
+      &#128172; <strong>Social</strong> — Reddit product mentions &amp; consumer sentiment<br><br>
+      My edge is connecting them — e.g. where social buzz meets a trade gap.
     </div>
   </div>
 
   <div class="suggested-queries" id="suggestedQueries">
-    <div class="suggested-q" data-q="Which countries have the fastest growing cosmetics imports?">&#128269; Which countries have the fastest growing cosmetics imports?</div>
-    <div class="suggested-q" data-q="What are the best markets to export K-beauty products to?">&#127759; What are the best markets to export K-beauty products to?</div>
-    <div class="suggested-q" data-q="Show me trade gaps where import demand exceeds local supply">&#128200; Show me trade gaps where import demand exceeds local supply</div>
-    <div class="suggested-q" data-q="Compare France vs South Korea cosmetics export growth">&#9878;&#65039; Compare France vs South Korea cosmetics export growth</div>
+    <div class="suggested-q" data-q="Does social sentiment for K-beauty match South Korea's cosmetics export growth?">&#128279; Does K-beauty social buzz match Korea's export growth?</div>
+    <div class="suggested-q" data-q="What products do people mention for oily skin, and how do they feel about them?">&#128172; Top products & sentiment for oily skin</div>
+    <div class="suggested-q" data-q="Which countries have the fastest growing cosmetics imports?">&#128200; Fastest-growing cosmetics import markets</div>
+    <div class="suggested-q" data-q="What's the consumer sentiment for CeraVe and is the US a net importer?">&#9878;&#65039; CeraVe sentiment vs US trade balance</div>
   </div>
 
   <div class="ai-input-area">
-    <textarea class="ai-input" id="aiInput" rows="1" placeholder="Ask about cosmetics trade data..."></textarea>
+    <textarea class="ai-input" id="aiInput" rows="1" placeholder="Ask about trade, social sentiment, or both..."></textarea>
     <button class="ai-send" id="aiSend" title="Send">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 2L11 13"/><path d="M22 2L15 22L11 13L2 9L22 2Z"/></svg>
     </button>
@@ -511,7 +693,41 @@
 </div>
 
 </div>
+</div><!-- /view-trade -->
+
+<!-- ═══════════ VIEW: SOCIAL DISCOVERY ═══════════ -->
+<div id="view-social" class="view">
+  <div class="social-wrap">
+    <div class="social-hero">
+      <h2>Discover products &amp; sentiment from social conversations</h2>
+      <p>Search a need or product category — find relevant posts, the products people mention, and how they feel about them.
+         <span id="socialSource" style="color:var(--accent2)"></span></p>
+    </div>
+    <div class="search-row">
+      <input class="social-search" id="socialSearch" placeholder="e.g. oily skin remover, retinol for wrinkles, korean sunscreen…" />
+      <button class="search-btn" id="socialSearchBtn">Search</button>
+    </div>
+    <div class="chips" id="exampleChips"></div>
+
+    <div id="socialResults"></div>
+    <div id="socialOverview"></div>
+  </div>
+</div>
+
+<!-- ═══════════ VIEW: SOURCE-TO-SELL (TRADE × SOCIAL FUSION) ═══════════ -->
+<div id="view-fusion" class="view">
+  <div class="social-wrap">
+    <div class="social-hero">
+      <h2>Source-to-Sell Opportunities</h2>
+      <p>Where consumer demand meets trade flows — <strong>source</strong> from the origins whose
+         brands shoppers love, <strong>sell</strong> into markets importing more than they make.</p>
+    </div>
+    <div id="fusionContent"><div style="text-align:center;color:var(--text2);padding:40px">Loading fusion…</div></div>
+  </div>
+</div>
 
 <script src="app.js"></script>
+<script src="social.js"></script>
+<script src="fusion.js"></script>
 </body>
 </html>

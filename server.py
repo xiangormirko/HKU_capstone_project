@@ -18,6 +18,8 @@ from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 
 from analytics import get_data
+from social import get_social
+from fusion import get_fusion
 
 HERE = Path(__file__).parent
 MODEL = os.environ.get("MODEL", "claude-sonnet-4-6")
@@ -30,14 +32,33 @@ def index():
     return send_from_directory(HERE, "index.html")
 
 
-@app.route("/app.js")
-def app_js():
-    return send_from_directory(HERE, "app.js", mimetype="application/javascript")
+@app.route("/<path:fname>.js")
+def serve_js(fname):
+    return send_from_directory(HERE, f"{fname}.js", mimetype="application/javascript")
 
 
 @app.route("/api/data")
 def api_data():
     return jsonify(get_data().build_payload(request.args.get("year")))
+
+
+# ───────── Social discovery (Reddit + future sources) ─────────
+@app.route("/api/social/overview")
+def api_social_overview():
+    return jsonify(get_social().overview())
+
+
+@app.route("/api/social/search")
+def api_social_search():
+    q = request.args.get("q", "")
+    limit = int(request.args.get("limit", "25"))
+    return jsonify(get_social().search(q, limit))
+
+
+# ───────── Source-to-Sell fusion (trade x social) ─────────
+@app.route("/api/fusion")
+def api_fusion():
+    return jsonify(get_fusion().payload())
 
 
 # ───────────────────────── agent tools ───────────────────────────
@@ -106,6 +127,35 @@ TOOLS = [
             "properties": {"year": {"type": "integer"}},
         },
     },
+    # ---- Social discovery tools (Reddit posts + comments) ----
+    {
+        "name": "social_search",
+        "description": "Search social posts (Reddit skincare communities) for a need or product category like 'oily skin remover' or 'retinol for wrinkles'. Returns the products & ingredients people mention, overall consumer sentiment (VADER), and sample posts. Use this to connect demand/sentiment signals to trade data.",
+        "input_schema": {
+            "type": "object",
+            "properties": {"query": {"type": "string"}},
+            "required": ["query"],
+        },
+    },
+    {
+        "name": "social_overview",
+        "description": "Overview of the social dataset: most-discussed product categories, brands and ingredients, each with consumer sentiment. Good for 'what are people talking about / what brands are buzzing'.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
+    {
+        "name": "product_sentiment",
+        "description": "Consumer sentiment for a specific brand, ingredient, or category (e.g. 'CeraVe', 'niacinamide', 'sunscreen') from social posts: mention volume, #posts, and average VADER sentiment.",
+        "input_schema": {
+            "type": "object",
+            "properties": {"name": {"type": "string"}},
+            "required": ["name"],
+        },
+    },
+    {
+        "name": "source_to_sell",
+        "description": "The fusion of TRADE + SOCIAL: 'Source-to-Sell' opportunities. Returns where to SOURCE (origin countries whose brands have social love, scored vs their cosmetics export strength), where to SELL (net-importer countries with unmet demand), and per-category source->sell routes. Use for 'where should I source/sell X' or any trade+social strategy question.",
+        "input_schema": {"type": "object", "properties": {}},
+    },
 ]
 
 
@@ -127,18 +177,31 @@ def run_tool(name, args):
             return d.corridors(args.get("n", 15), args.get("exporter"), args.get("importer"))
         if name == "region_breakdown":
             return d.region_breakdown(args.get("year"))
+        if name == "social_search":
+            return get_social().agent_search(args["query"])
+        if name == "social_overview":
+            return get_social().agent_overview()
+        if name == "product_sentiment":
+            return get_social().product_sentiment(args["name"])
+        if name == "source_to_sell":
+            return get_fusion().payload()
     except Exception as e:  # noqa: BLE001
         return {"error": str(e)}
     return {"error": f"unknown tool {name}"}
 
 
-SYSTEM = """You are the Trade Analyst AI for CosmoTrade Intelligence, an analytics platform for HS 3304 (beauty & make-up preparations) global trade.
+SYSTEM = """You are the Product Scout AI, an analyst for cosmetics e-commerce that sees TWO real datasets:
 
-Your data is REAL official UN Comtrade customs statistics. You MUST use the provided tools to obtain any figure — never guess or recall numbers from memory. If a tool returns no data for a request, say so plainly.
+1. TRADE — official UN Comtrade customs statistics for HS 3304 (beauty & make-up preparations): country exports/imports, growth, corridors, regions. Tools: top_countries, country_profile, country_trend, trade_corridors, region_breakdown, list_available.
+2. SOCIAL — real consumer conversations (Reddit skincare communities): which products/ingredients people discuss and how they FEEL about them (VADER sentiment). Tools: social_search, social_overview, product_sentiment.
 
-Audience: e-commerce operators and brands deciding where to source and sell cosmetics. Give sharp, decision-useful analysis: who exports/imports most, growth trends, trade gaps, and concrete market opportunities. When relevant, translate figures into a recommendation.
+You MUST use tools to obtain any figure — never guess or recall numbers from memory. If a tool returns nothing, say so plainly.
 
-Formatting: reply in concise HTML fragments (no markdown, no <html> wrapper). Use <strong> for emphasis, <br> for line breaks, and <ul><li> for lists. Keep it tight — a short paragraph plus a few bullets. Always ground claims in the specific numbers you retrieved. Note that figures are USD and the most recent fully-reported year may lag the current calendar year."""
+Your edge is CONNECTING the two: e.g. a country/category growing in trade AND rising in social sentiment is a strong signal; high demand/sentiment with weak local supply is an export opportunity. When a question spans both, call tools from both domains and synthesize. The `source_to_sell` tool gives a ready-made fusion (where to source by brand-origin export strength, where to sell by net-import demand) — use it for sourcing/selling strategy questions. For purely-trade or purely-social questions, just use the relevant tools.
+
+Audience: e-commerce operators and brands deciding what to sell and where to source/sell. Be sharp and decision-useful; translate numbers into a recommendation.
+
+Formatting: concise HTML fragments (no markdown, no <html> wrapper). Use <strong>, <br>, and <ul><li>. Keep it tight — a short paragraph plus a few bullets. Ground every claim in retrieved numbers. Trade figures are USD; the latest fully-reported trade year may lag the calendar year. Social sentiment ranges -1 (very negative) to +1 (very positive)."""
 
 
 @app.route("/api/chat", methods=["POST"])

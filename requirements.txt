@@ -4,3 +4,4 @@ pandas>=2.0
 requests>=2.31
 pycountry>=23.12
 pycountry-convert>=0.7
+vaderSentiment>=3.3

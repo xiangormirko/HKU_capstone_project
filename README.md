@@ -1,10 +1,58 @@
-# CosmoTrade Intelligence — HS 3304
+# Product Scout
 
-Global cosmetics (beauty & make-up preparations, **HS 3304**) trade analytics
-dashboard with a **real, geographic world map**, fully **real data**, and a
-**real Claude AI analyst** that can query the dataset and reason about it.
+Two core features for cosmetics e-commerce intelligence, switchable from the top
+menu bar:
 
-## What's real (no mock data)
+1. **🌐 Trade Intelligence** — global cosmetics (HS 3304) import/export analytics
+   with a real geographic world map, real UN Comtrade data, and a real Claude AI
+   analyst that queries the dataset.
+2. **💬 Social Discovery** — product & sentiment discovery from social posts.
+   Query a need like *"oily skin remover"* and get the most relevant posts, the
+   products/ingredients people mention, and how they feel about them
+   (VADER sentiment). Reddit today; **Google Trends / other platforms slot in
+   later** via the same source-agnostic schema.
+3. **🎯 Source-to-Sell** — the fusion of the two: links social brand demand to
+   country trade flows via **brand origin**. Shows **where to source** (origin
+   countries whose brands shoppers love, scored vs their cosmetics export
+   strength — e.g. K-beauty/Korea) and **where to sell** (net-importer countries
+   with unmet demand — e.g. China), plus per-category source→sell routes.
+   Backend: `fusion.py` + `/api/fusion`; the AI agent also has a `source_to_sell`
+   tool. *Honest scope: HS 3304 trade is one code (category-agnostic); the social
+   side supplies product-type & sentiment granularity; brand origin bridges them.*
+
+---
+
+## Social Discovery pipeline
+
+```
+data/skincare_multi_sub_data.json   (Reddit dump: posts + comments)
+        │  python social_ingest.py
+        ▼
+social_taxonomy.py   categories / brands / ingredients dictionaries (extensible)
+social_ingest.py     entity extraction + VADER sentiment per post & comment
+        ▼ produces in data/
+  social_relationships.csv  ← the RELATIONSHIP TABLE (post ↔ product/category links)
+  social_posts.json         ← processed posts w/ sentiment + matched entities
+  social_entities.json      ← per-brand/ingredient/category rollups (mentions, sentiment)
+  social_categories.json    ← per-category rollups
+social.py            query layer: resolves a phrase → category/brand/ingredient,
+                     ranks relevant posts, aggregates products + sentiment
+```
+
+API: `GET /api/social/overview`, `GET /api/social/search?q=oily+skin+remover`.
+
+A query resolves to product categories/brands/ingredients, returns ranked posts
+(each with post sentiment, discussion sentiment from its comments, mentioned
+products, and the top community comment), plus an aggregate of the most-mentioned
+products/ingredients with their sentiment.
+
+**Add a new source** (e.g. Google Trends): emit records carrying a `source` field
+and the same post shape, reuse `social_taxonomy.py`, and append to the processed
+files — the query layer and UI need no changes.
+
+---
+
+## Trade Intelligence — what's real (no mock data)
 
 | Piece | Source |
 |---|---|
@@ -29,19 +77,30 @@ app.js          → fetches real data, renders charts + D3 map, drives the chat
 
 The AI panel needs a backend because an API key must never live in the browser.
 The chat posts the conversation to `/api/chat`; the server runs a Claude
-**tool-use loop** — Claude calls tools like `top_countries`, `country_trend`,
-`trade_corridors`, `region_breakdown` against the real pandas dataset, then
-composes the answer. It never invents numbers.
+**tool-use loop**. **Product Scout AI is cross-domain** — it has tools over both
+datasets and can connect them in one answer:
+
+* Trade: `top_countries`, `country_profile`, `country_trend`, `trade_corridors`,
+  `region_breakdown`
+* Social: `social_search`, `social_overview`, `product_sentiment`
+
+So it can answer e.g. *"Does K-beauty social buzz match Korea's export growth?"*
+by calling a trade tool and a social tool, then synthesizing. It never invents
+numbers — every figure comes from a tool.
 
 ## Run it
 
 ```bash
 pip install -r requirements.txt
 
-python fetch_data.py                 # ~2 min: pulls real data into data/
-export ANTHROPIC_API_KEY=sk-ant-...  # enables the AI analyst (see .env.example)
+python fetch_data.py                 # ~2 min: pulls real trade data into data/
+python social_ingest.py              # processes the Reddit dump (entities + sentiment)
+export ANTHROPIC_API_KEY=sk-ant-...  # enables the Trade AI analyst (see .env.example)
 python server.py                     # → http://localhost:8600
 ```
+
+`social_ingest.py` looks for `data/skincare_multi_sub_data.json` (auto-copied
+from `~/Downloads` on first run) or takes a path argument.
 
 Without an API key, the whole dashboard still runs on real data — only the AI
 panel shows a "connect your key" notice.
