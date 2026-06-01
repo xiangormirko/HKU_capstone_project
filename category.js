@@ -180,7 +180,6 @@ function renderAspectChart(aspects) {
 }
 
 // ───────────────────────── Google Trends module (real data) ─────────────────────────
-const FLAG = { HK: '🇭🇰', JP: '🇯🇵', US: '🇺🇸', KR: '🇰🇷' };
 const trendCls = l => l === 'rising' ? 't-rising' : l === 'declining' ? 't-declining'
   : l === 'stable' ? 't-stable' : 't-muted';
 const pct = x => x == null ? '—' : (x >= 0 ? '+' : '') + Math.round(x * 100) + '%';
@@ -195,7 +194,7 @@ function trendsModule(t) {
   return `<div class="module">
     <div class="module-head"><h3>Google Trends — search interest</h3><span class="src-badge">${esc(t.source)} · to ${esc(t.latest_date)}</span></div>
     <div class="trend-tabs" id="trendCountryTabs">
-      ${t.countries.map(c => `<button class="tcountry ${c.code === t.default_country ? 'active' : ''}" data-c="${c.code}">${FLAG[c.code] || ''} ${esc(c.name)}</button>`).join('')}
+      ${t.countries.map(c => `<button class="tcountry ${c.code === t.default_country ? 'active' : ''}" data-c="${c.code}">${esc(c.name)}</button>`).join('')}
     </div>
     <div id="trendBody"></div>
   </div>`;

@@ -1,43 +1,326 @@
 country,query_id,category,type,keyword,avg_score,peak_score,recent_mean,prior_mean,momentum_3m,momentum_6m,growth_yoy,trend_label,latest_date
+AU,brands_tier1,brands,brand,Laneige,19.43,33.0,23.46,16.85,0.393,0.087,-0.006,rising,2025-12-28
+AU,brands_tier1,brands,brand,La Roche-Posay,8.5,19.0,14.15,11.0,0.287,0.521,0.576,rising,2025-12-28
+AU,brands_tier2,brands,brand,Torriden,3.37,8.0,5.23,4.08,0.283,0.344,0.496,rising,2025-12-28
+AU,brands_tier2,brands,brand,COSRX,10.74,15.0,12.46,10.31,0.209,0.184,-0.039,rising,2025-12-28
+AU,brands_tier2,brands,brand,Anua,15.57,26.0,18.77,16.31,0.151,0.081,0.19,stable,2025-12-28
+AU,brands_tier2,brands,brand,The Ordinary,57.43,85.0,67.77,59.92,0.131,0.123,0.108,stable,2025-12-28
+AU,brands_tier1,brands,brand,Neutrogena,22.58,34.0,27.38,24.23,0.13,0.173,0.125,stable,2025-12-28
+AU,brands_tier1,brands,brand,Cetaphil,26.51,36.0,30.85,28.23,0.093,0.124,0.111,stable,2025-12-28
+AU,brands_tier1,brands,brand,CeraVe,52.39,100.0,61.38,58.31,0.053,0.227,0.079,stable,2025-12-28
+AU,brands_tier2,brands,brand,CeraVe,52.39,100.0,61.38,58.31,0.053,0.227,0.079,stable,2025-12-28
+AU,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,20.26,33.0,25.92,21.08,0.23,0.212,0.121,rising,2025-12-28
+AU,cleanser_baseline,cleanser_oil_control,baseline,face wash,70.43,100.0,87.54,75.0,0.167,0.143,0.18,stable,2025-12-28
+AU,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,66.38,100.0,79.08,69.54,0.137,0.12,0.126,stable,2025-12-28
+AU,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.32,9.0,0.62,0.62,0.0,,-0.111,stable,2025-12-28
+AU,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.7,11.0,0.0,0.62,-1.0,0.0,-0.66,declining,2025-12-28
+AU,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,31.9,62.0,43.69,35.85,0.219,0.184,0.343,rising,2025-12-28
+AU,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,62.1,100.0,77.38,68.0,0.138,0.205,0.155,stable,2025-12-28
+AU,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,63.94,100.0,80.92,77.38,0.046,0.209,0.297,stable,2025-12-28
+AU,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,1.33,20.0,8.92,0.0,,,3.833,insufficient data,2025-12-28
+AU,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.25,13.0,1.0,0.0,,0.0,,insufficient data,2025-12-28
+AU,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,49.56,100.0,75.85,51.92,0.461,0.458,0.193,rising,2025-12-28
+AU,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,38.24,91.0,62.62,48.0,0.304,0.563,0.439,rising,2025-12-28
+AU,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,51.09,100.0,73.54,60.0,0.226,0.201,0.485,rising,2025-12-28
+AU,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,4.57,19.0,10.08,8.38,0.202,2.288,0.874,rising,2025-12-28
+AU,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,10.74,27.0,15.92,13.46,0.183,0.516,0.315,stable,2025-12-28
+DE,brands_tier1,brands,brand,Laneige,12.94,23.0,17.0,9.23,0.842,0.046,-0.013,rising,2025-12-28
+DE,brands_tier1,brands,brand,La Roche-Posay,12.38,38.0,24.69,14.38,0.717,0.38,1.106,rising,2025-12-28
+DE,brands_tier2,brands,brand,Torriden,1.47,4.0,2.85,1.69,0.682,0.283,1.234,rising,2025-12-28
+DE,brands_tier2,brands,brand,Anua,11.66,21.0,17.23,10.77,0.6,0.096,0.357,rising,2025-12-28
+DE,brands_tier2,brands,brand,COSRX,10.23,24.0,15.62,10.15,0.538,0.324,0.238,rising,2025-12-28
+DE,brands_tier2,brands,brand,The Ordinary,49.67,86.0,65.08,46.15,0.41,0.125,0.131,rising,2025-12-28
+DE,brands_tier1,brands,brand,Neutrogena,28.6,53.0,35.0,25.62,0.366,-0.005,0.13,rising,2025-12-28
+DE,brands_tier1,brands,brand,Cetaphil,20.61,29.0,22.69,16.69,0.359,-0.132,0.053,rising,2025-12-28
+DE,brands_tier1,brands,brand,CeraVe,55.93,100.0,74.85,55.46,0.35,0.164,0.18,rising,2025-12-28
+DE,brands_tier2,brands,brand,CeraVe,55.93,100.0,74.85,55.46,0.35,0.164,0.18,rising,2025-12-28
+DE,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,5.26,37.0,17.08,1.92,7.88,1.205,1.063,rising,2025-12-28
+DE,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,16.21,55.0,27.31,9.08,2.008,0.022,0.243,rising,2025-12-28
+DE,cleanser_baseline,cleanser_oil_control,baseline,face wash,29.82,100.0,63.77,22.62,1.82,0.513,0.496,rising,2025-12-28
+DE,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,6.32,100.0,2.85,0.0,,-0.213,-0.851,insufficient data,2025-12-28
+DE,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.18,10.0,0.0,0.0,,-1.0,0.111,insufficient data,2025-12-28
+DE,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,8.41,28.0,19.85,6.15,2.225,0.523,0.801,rising,2025-12-28
+DE,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,36.4,100.0,65.77,28.38,1.317,0.385,0.258,rising,2025-12-28
+DE,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,32.39,100.0,64.62,31.46,1.054,0.359,0.804,rising,2025-12-28
+DE,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,1.31,26.0,10.62,0.0,,,,insufficient data,2025-12-28
+DE,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+DE,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,15.71,54.0,29.85,13.69,1.18,0.384,0.493,rising,2025-12-28
+DE,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,50.6,100.0,68.69,44.46,0.545,-0.073,0.371,rising,2025-12-28
+DE,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,32.66,100.0,53.85,35.38,0.522,0.033,0.992,rising,2025-12-28
+DE,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,27.94,79.0,43.15,35.23,0.225,-0.16,2.179,rising,2025-12-28
+DE,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+FR,brands_tier1,brands,brand,Cetaphil,4.32,13.0,8.0,3.46,1.311,0.307,0.406,rising,2025-12-28
+FR,brands_tier1,brands,brand,Laneige,18.82,42.0,29.23,13.62,1.147,0.252,0.06,rising,2025-12-28
+FR,brands_tier1,brands,brand,La Roche-Posay,14.1,40.0,26.54,15.77,0.683,0.463,0.702,rising,2025-12-28
+FR,brands_tier1,brands,brand,Neutrogena,14.1,26.0,18.38,12.31,0.494,0.078,0.102,rising,2025-12-28
+FR,brands_tier2,brands,brand,The Ordinary,62.7,100.0,76.0,52.85,0.438,0.119,-0.042,rising,2025-12-28
+FR,brands_tier2,brands,brand,Anua,12.3,22.0,16.08,12.15,0.323,-0.034,0.409,rising,2025-12-28
+FR,brands_tier2,brands,brand,COSRX,9.99,18.0,13.23,10.08,0.313,0.247,0.119,rising,2025-12-28
+FR,brands_tier2,brands,brand,CeraVe,66.62,97.0,79.46,61.85,0.285,0.085,0.045,rising,2025-12-28
+FR,brands_tier1,brands,brand,CeraVe,68.64,100.0,81.69,63.69,0.283,0.083,0.044,rising,2025-12-28
+FR,brands_tier2,brands,brand,Torriden,2.04,6.0,4.15,3.46,0.2,0.5,2.367,stable,2025-12-28
+FR,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,7.04,100.0,46.92,3.23,13.524,,6.494,rising,2025-12-28
+FR,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,7.22,69.0,38.69,3.46,10.178,14.657,2.331,rising,2025-12-28
+FR,cleanser_baseline,cleanser_oil_control,baseline,face wash,20.11,100.0,58.38,13.23,3.413,1.249,0.779,rising,2025-12-28
+FR,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,1.35,39.0,0.0,0.0,,-1.0,-0.621,insufficient data,2025-12-28
+FR,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+FR,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,23.99,100.0,63.38,17.85,2.552,0.941,0.782,rising,2025-12-28
+FR,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,10.08,100.0,52.85,0.0,,2.026,6.617,insufficient data,2025-12-28
+FR,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,1.41,34.0,9.23,0.0,,,3.286,insufficient data,2025-12-28
+FR,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,5.52,55.0,30.62,0.0,,2.586,6.169,insufficient data,2025-12-28
+FR,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+FR,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,10.82,100.0,55.69,5.69,8.784,2.325,9.592,rising,2025-12-28
+FR,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,33.36,100.0,66.85,30.46,1.194,0.406,0.641,rising,2025-12-28
+FR,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,2.48,58.0,10.92,0.0,,2.381,1.421,insufficient data,2025-12-28
+FR,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,1.06,60.0,8.54,0.0,,,,insufficient data,2025-12-28
+FR,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,4.84,57.0,26.15,0.0,,1.024,,insufficient data,2025-12-28
+GB,brands_tier1,brands,brand,Laneige,30.82,79.0,47.23,23.85,0.981,0.183,0.134,rising,2025-12-28
+GB,brands_tier1,brands,brand,La Roche-Posay,9.0,23.0,14.85,9.46,0.569,0.269,0.507,rising,2025-12-28
+GB,brands_tier2,brands,brand,The Ordinary,60.55,100.0,79.62,60.0,0.327,0.142,0.182,rising,2025-12-28
+GB,brands_tier2,brands,brand,Anua,16.7,28.0,21.62,16.62,0.301,0.055,0.252,rising,2025-12-28
+GB,brands_tier2,brands,brand,COSRX,9.54,13.0,10.15,8.15,0.245,-0.012,-0.064,rising,2025-12-28
+GB,brands_tier1,brands,brand,CeraVe,68.79,100.0,76.62,61.62,0.243,0.047,-0.032,rising,2025-12-28
+GB,brands_tier2,brands,brand,CeraVe,53.21,77.0,59.15,47.77,0.238,0.048,-0.032,rising,2025-12-28
+GB,brands_tier2,brands,brand,Torriden,1.68,3.0,2.54,2.08,0.222,0.277,0.574,rising,2025-12-28
+GB,brands_tier1,brands,brand,Cetaphil,17.36,23.0,19.69,16.85,0.169,0.019,0.088,stable,2025-12-28
+GB,brands_tier1,brands,brand,Neutrogena,17.79,24.0,18.85,17.85,0.056,-0.036,0.106,stable,2025-12-28
+GB,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,5.92,14.0,7.23,4.15,0.741,0.113,-0.146,rising,2025-12-28
+GB,cleanser_baseline,cleanser_oil_control,baseline,face wash,69.1,100.0,85.08,72.23,0.178,0.184,0.106,stable,2025-12-28
+GB,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,23.41,38.0,28.46,26.54,0.072,0.302,0.085,stable,2025-12-28
+GB,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,78.09,100.0,82.46,78.77,0.047,0.081,-0.011,stable,2025-12-28
+GB,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.1,5.0,0.0,0.0,,-1.0,,insufficient data,2025-12-28
+GB,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,5.38,16.0,9.54,4.0,1.385,0.135,0.415,rising,2025-12-28
+GB,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,68.66,100.0,79.46,61.92,0.283,0.002,0.061,rising,2025-12-28
+GB,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,28.87,44.0,34.08,26.69,0.277,-0.011,0.124,rising,2025-12-28
+GB,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,64.66,100.0,86.38,68.62,0.259,0.079,0.357,rising,2025-12-28
+GB,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.14,5.0,0.38,0.38,0.0,1.0,,stable,2025-12-28
+GB,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,25.09,54.0,20.0,19.69,0.016,-0.35,0.006,stable,2025-12-28
+GB,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,26.16,67.0,23.77,25.0,-0.049,-0.399,0.616,stable,2025-12-28
+GB,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,33.55,100.0,20.23,37.31,-0.458,-0.405,0.328,declining,2025-12-28
+GB,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,33.17,100.0,19.08,36.15,-0.472,-0.377,0.171,declining,2025-12-28
+GB,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.82,6.0,0.46,1.23,-0.625,-0.522,2.778,declining,2025-12-28
+HK,brands_tier2,brands,brand,Anua,16.03,52.0,29.38,19.62,0.498,0.292,1.093,rising,2025-12-28
+HK,brands_tier1,brands,brand,Cetaphil,38.16,68.0,46.08,39.08,0.179,0.122,0.114,stable,2025-12-28
+HK,brands_tier2,brands,brand,COSRX,9.52,21.0,8.62,7.38,0.167,-0.055,-0.234,stable,2025-12-28
+HK,brands_tier2,brands,brand,The Ordinary,54.47,95.0,60.85,57.69,0.055,0.13,0.047,stable,2025-12-28
+HK,brands_tier1,brands,brand,La Roche-Posay,1.13,14.0,1.92,1.85,0.042,1.042,0.587,stable,2025-12-28
+HK,brands_tier1,brands,brand,Laneige,49.53,76.0,49.15,47.46,0.036,-0.054,0.013,stable,2025-12-28
+HK,brands_tier1,brands,brand,CeraVe,64.6,100.0,67.46,66.46,0.015,0.047,0.026,stable,2025-12-28
+HK,brands_tier2,brands,brand,CeraVe,64.6,100.0,67.46,66.46,0.015,0.047,0.026,stable,2025-12-28
+HK,brands_tier2,brands,brand,Torriden,34.83,59.0,34.62,34.62,0.0,-0.168,0.195,stable,2025-12-28
+HK,brands_tier1,brands,brand,Neutrogena,22.2,38.0,20.0,20.15,-0.008,-0.106,-0.078,stable,2025-12-28
 HK,cleanser_baseline,cleanser_oil_control,baseline,face wash,45.32,100.0,49.38,46.23,0.068,0.149,-0.03,stable,2025-12-28
-HK,cleanser_brands,cleanser_oil_control,brand,Laneige,49.53,76.0,49.15,47.46,0.036,-0.054,0.013,stable,2025-12-28
-HK,cleanser_brands,cleanser_oil_control,brand,CeraVe,64.6,100.0,67.46,66.46,0.015,0.047,0.026,stable,2025-12-28
 HK,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.63,66.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
 HK,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,3.88,100.0,0.0,0.0,,-1.0,-0.29,insufficient data,2025-12-28
 HK,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
 HK,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
 HK,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,56.29,100.0,63.31,52.08,0.216,0.043,0.006,rising,2025-12-28
-HK,moisturizer_brands,moisturizer_hydration,brand,Laneige,49.53,76.0,49.15,47.46,0.036,-0.054,0.013,stable,2025-12-28
-HK,moisturizer_brands,moisturizer_hydration,brand,CeraVe,64.6,100.0,67.46,66.46,0.015,0.047,0.026,stable,2025-12-28
 HK,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,1.74,96.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
 HK,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
 HK,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,0.95,100.0,0.0,0.0,,-1.0,,insufficient data,2025-12-28
 HK,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
-HK,sunscreen_brands,sunscreen_spf,brand,Laneige,49.53,76.0,49.15,47.46,0.036,-0.054,0.013,stable,2025-12-28
-HK,sunscreen_brands,sunscreen_spf,brand,CeraVe,64.6,100.0,67.46,66.46,0.015,0.047,0.026,stable,2025-12-28
 HK,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,52.65,100.0,44.85,63.15,-0.29,-0.055,0.108,declining,2025-12-28
 HK,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
 HK,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,2.84,81.0,6.0,0.0,,-0.497,2.585,insufficient data,2025-12-28
 HK,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
 HK,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,0.95,100.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+JP,brands_tier1,brands,brand,La Roche-Posay,4.21,61.0,30.69,1.38,21.167,51.125,24.0,rising,2025-12-28
+JP,brands_tier1,brands,brand,Neutrogena,4.9,42.0,19.31,1.62,10.952,2.627,1.129,rising,2025-12-28
+JP,brands_tier2,brands,brand,CeraVe,14.88,97.0,53.85,8.77,5.14,2.037,1.288,rising,2025-12-28
+JP,brands_tier1,brands,brand,CeraVe,15.39,100.0,55.54,9.08,5.119,2.011,1.288,rising,2025-12-28
+JP,brands_tier1,brands,brand,Cetaphil,8.64,45.0,25.08,4.46,4.621,1.133,0.674,rising,2025-12-28
+JP,brands_tier2,brands,brand,The Ordinary,25.93,78.0,53.46,24.69,1.165,0.805,0.396,rising,2025-12-28
+JP,brands_tier2,brands,brand,COSRX,31.7,68.0,38.92,24.38,0.596,0.21,-0.164,rising,2025-12-28
+JP,brands_tier1,brands,brand,Laneige,15.71,38.0,23.38,15.08,0.551,0.114,0.383,rising,2025-12-28
+JP,brands_tier2,brands,brand,Torriden,13.67,27.0,19.77,13.15,0.503,0.144,0.279,rising,2025-12-28
+JP,brands_tier2,brands,brand,Anua,45.52,100.0,69.08,51.0,0.354,0.145,0.597,rising,2025-12-28
 JP,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,6.48,73.0,35.23,4.62,6.633,6.507,5.312,rising,2025-12-28
-JP,cleanser_brands,cleanser_oil_control,brand,CeraVe,15.39,100.0,55.54,9.08,5.119,2.011,1.288,rising,2025-12-28
 JP,cleanser_baseline,cleanser_oil_control,baseline,face wash,18.62,100.0,59.38,11.85,4.013,1.309,1.154,rising,2025-12-28
-JP,cleanser_brands,cleanser_oil_control,brand,Laneige,15.71,38.0,23.38,15.08,0.551,0.114,0.383,rising,2025-12-28
 JP,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.27,28.0,2.15,0.0,,,,insufficient data,2025-12-28
 JP,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
 JP,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,4.83,100.0,39.0,0.0,,,,insufficient data,2025-12-28
 JP,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,6.26,100.0,43.92,2.31,18.033,29.05,16.25,rising,2025-12-28
 JP,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,15.7,100.0,53.54,8.38,5.385,1.492,1.216,rising,2025-12-28
-JP,moisturizer_brands,moisturizer_hydration,brand,CeraVe,15.39,100.0,55.54,9.08,5.119,2.011,1.288,rising,2025-12-28
-JP,moisturizer_brands,moisturizer_hydration,brand,Laneige,15.71,38.0,23.38,15.08,0.551,0.114,0.383,rising,2025-12-28
 JP,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,2.71,53.0,21.92,0.0,,,,insufficient data,2025-12-28
 JP,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,1.89,38.0,15.23,0.0,,,,insufficient data,2025-12-28
 JP,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.26,27.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
 JP,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,4.44,52.0,30.31,1.77,16.13,7.51,,rising,2025-12-28
-JP,sunscreen_brands,sunscreen_spf,brand,CeraVe,15.39,100.0,55.54,9.08,5.119,2.011,1.288,rising,2025-12-28
 JP,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,23.19,100.0,61.46,19.31,2.183,0.872,0.982,rising,2025-12-28
-JP,sunscreen_brands,sunscreen_spf,brand,Laneige,15.71,38.0,23.38,15.08,0.551,0.114,0.383,rising,2025-12-28
 JP,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,0.94,34.0,7.62,0.0,,,,insufficient data,2025-12-28
 JP,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,7.17,100.0,56.15,0.0,,30.739,,insufficient data,2025-12-28
 JP,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+KR,brands_tier1,brands,brand,CeraVe,15.15,100.0,54.08,2.46,20.969,1.634,0.795,rising,2025-12-28
+KR,brands_tier2,brands,brand,CeraVe,15.15,100.0,54.08,2.46,20.969,1.634,0.795,rising,2025-12-28
+KR,brands_tier2,brands,brand,The Ordinary,16.48,77.0,43.15,8.46,4.1,0.991,0.424,rising,2025-12-28
+KR,brands_tier2,brands,brand,COSRX,15.05,50.0,28.0,12.77,1.193,0.568,0.236,rising,2025-12-28
+KR,brands_tier2,brands,brand,Anua,16.11,40.0,29.62,17.31,0.711,0.459,0.569,rising,2025-12-28
+KR,brands_tier2,brands,brand,Torriden,13.18,35.0,21.0,12.69,0.655,0.207,0.388,rising,2025-12-28
+KR,brands_tier1,brands,brand,Laneige,13.45,30.0,19.85,12.31,0.612,0.164,0.251,rising,2025-12-28
+KR,brands_tier1,brands,brand,Cetaphil,9.15,48.0,23.0,0.0,,0.444,0.124,insufficient data,2025-12-28
+KR,brands_tier1,brands,brand,La Roche-Posay,4.66,70.0,35.62,0.0,,76.167,22.45,insufficient data,2025-12-28
+KR,brands_tier1,brands,brand,Neutrogena,7.42,46.0,21.46,0.0,,1.051,0.159,insufficient data,2025-12-28
+KR,cleanser_baseline,cleanser_oil_control,baseline,face wash,23.73,100.0,58.15,1.0,57.154,0.532,0.068,rising,2025-12-28
+KR,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.38,40.0,3.08,0.0,,,,insufficient data,2025-12-28
+KR,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,22.46,82.0,26.69,0.0,,-0.166,-0.509,insufficient data,2025-12-28
+KR,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+KR,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,5.27,100.0,37.54,0.0,,,6.508,insufficient data,2025-12-28
+KR,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,17.72,100.0,47.92,4.08,10.755,0.837,0.308,rising,2025-12-28
+KR,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,9.06,100.0,54.31,0.0,,3.675,8.117,insufficient data,2025-12-28
+KR,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,3.64,66.0,29.38,0.0,,,,insufficient data,2025-12-28
+KR,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,2.7,46.0,18.38,0.0,,10.381,9.833,insufficient data,2025-12-28
+KR,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+KR,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,22.59,100.0,54.85,9.77,4.614,0.582,0.396,rising,2025-12-28
+KR,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,1.81,33.0,9.15,2.23,3.103,,2.524,rising,2025-12-28
+KR,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,10.59,100.0,51.92,0.0,,4.315,1.587,insufficient data,2025-12-28
+KR,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+KR,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,4.6,60.0,29.08,0.0,,3.554,19.955,insufficient data,2025-12-28
+MY,brands_tier1,brands,brand,La Roche-Posay,5.38,28.0,14.92,8.31,0.796,0.669,4.89,rising,2025-12-28
+MY,brands_tier1,brands,brand,Neutrogena,17.05,35.0,19.92,14.15,0.408,0.07,-0.061,rising,2025-12-28
+MY,brands_tier2,brands,brand,Anua,22.4,43.0,22.77,17.54,0.298,0.006,-0.178,rising,2025-12-28
+MY,brands_tier1,brands,brand,CeraVe,53.73,100.0,75.62,63.23,0.196,0.287,0.346,stable,2025-12-28
+MY,brands_tier2,brands,brand,CeraVe,42.64,79.0,60.0,50.15,0.196,0.288,0.345,stable,2025-12-28
+MY,brands_tier1,brands,brand,Cetaphil,60.16,96.0,66.0,56.15,0.175,0.023,0.015,stable,2025-12-28
+MY,brands_tier2,brands,brand,Torriden,13.75,24.0,19.77,17.23,0.147,0.44,0.315,stable,2025-12-28
+MY,brands_tier1,brands,brand,Laneige,40.64,60.0,40.38,35.46,0.139,-0.082,-0.047,stable,2025-12-28
+MY,brands_tier2,brands,brand,The Ordinary,43.29,85.0,50.15,49.62,0.011,0.198,0.122,stable,2025-12-28
+MY,brands_tier2,brands,brand,COSRX,37.6,100.0,26.77,27.38,-0.022,-0.061,-0.398,stable,2025-12-28
+MY,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,12.9,39.0,17.46,4.92,2.547,1.385,-0.548,rising,2025-12-28
+MY,cleanser_baseline,cleanser_oil_control,baseline,face wash,71.17,100.0,86.31,74.0,0.166,0.134,0.129,stable,2025-12-28
+MY,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,63.5,100.0,60.77,53.38,0.138,0.002,-0.181,stable,2025-12-28
+MY,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,4.67,29.0,0.0,0.0,,-1.0,-0.879,insufficient data,2025-12-28
+MY,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+MY,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,18.63,100.0,49.54,15.08,2.286,7.235,-0.03,rising,2025-12-28
+MY,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,28.99,99.0,59.46,33.23,0.789,0.271,1.416,rising,2025-12-28
+MY,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,5.01,65.0,10.31,7.23,0.426,1.651,0.481,rising,2025-12-28
+MY,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,63.6,100.0,67.0,58.46,0.146,0.055,-0.07,stable,2025-12-28
+MY,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.47,49.0,0.0,3.77,-1.0,,,declining,2025-12-28
+MY,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,17.01,48.0,26.08,14.15,0.842,0.26,0.106,rising,2025-12-28
+MY,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,62.25,100.0,58.62,59.54,-0.016,0.0,-0.093,stable,2025-12-28
+MY,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,44.18,100.0,53.23,60.15,-0.115,-0.151,1.3,stable,2025-12-28
+MY,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,0.42,23.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+MY,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+PH,brands_tier1,brands,brand,La Roche-Posay,0.7,8.0,4.08,0.54,6.571,7.571,8.571,rising,2025-12-28
+PH,brands_tier2,brands,brand,Torriden,1.6,7.0,4.15,0.69,5.0,0.235,1.111,rising,2025-12-28
+PH,brands_tier1,brands,brand,CeraVe,31.08,47.0,33.69,29.0,0.162,-0.011,0.039,stable,2025-12-28
+PH,brands_tier2,brands,brand,CeraVe,37.17,56.0,40.15,34.62,0.16,-0.015,0.038,stable,2025-12-28
+PH,brands_tier1,brands,brand,Neutrogena,14.88,22.0,14.69,12.69,0.158,-0.108,-0.041,stable,2025-12-28
+PH,brands_tier1,brands,brand,Laneige,7.6,12.0,8.08,7.15,0.129,-0.043,0.055,stable,2025-12-28
+PH,brands_tier2,brands,brand,Anua,12.57,23.0,12.46,11.08,0.125,-0.14,0.03,stable,2025-12-28
+PH,brands_tier2,brands,brand,COSRX,20.53,32.0,18.92,17.85,0.06,0.006,-0.186,stable,2025-12-28
+PH,brands_tier1,brands,brand,Cetaphil,74.17,100.0,74.0,72.54,0.02,-0.047,0.028,stable,2025-12-28
+PH,brands_tier2,brands,brand,The Ordinary,67.86,100.0,61.92,69.23,-0.106,0.045,-0.101,stable,2025-12-28
+PH,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,42.08,100.0,42.38,37.92,0.118,0.027,-0.103,stable,2025-12-28
+PH,cleanser_baseline,cleanser_oil_control,baseline,face wash,72.2,100.0,78.38,70.38,0.114,-0.003,0.07,stable,2025-12-28
+PH,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,28.3,42.0,26.15,27.38,-0.045,0.028,-0.118,stable,2025-12-28
+PH,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,1.17,10.0,0.0,0.0,,-1.0,-0.872,insufficient data,2025-12-28
+PH,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.06,6.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+PH,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,2.76,49.0,6.46,3.31,0.953,,-0.221,rising,2025-12-28
+PH,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,24.44,100.0,57.69,45.31,0.273,0.891,2.944,rising,2025-12-28
+PH,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,17.76,71.0,41.23,32.92,0.252,0.743,3.359,rising,2025-12-28
+PH,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,70.3,100.0,78.77,70.69,0.114,0.019,0.119,stable,2025-12-28
+PH,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.32,34.0,0.0,0.0,,-1.0,,insufficient data,2025-12-28
+PH,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,60.7,100.0,56.08,53.69,0.044,-0.209,0.052,stable,2025-12-28
+PH,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,46.1,100.0,49.62,53.62,-0.075,-0.158,0.583,stable,2025-12-28
+PH,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,19.28,66.0,15.15,17.08,-0.113,-0.414,0.292,stable,2025-12-28
+PH,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,2.65,16.0,1.54,2.31,-0.333,-0.107,-0.342,declining,2025-12-28
+PH,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+SG,brands_tier1,brands,brand,La Roche-Posay,5.27,36.0,21.38,4.31,3.964,2.009,3.12,rising,2025-12-28
+SG,brands_tier2,brands,brand,Anua,30.62,56.0,33.85,21.85,0.549,-0.035,-0.136,rising,2025-12-28
+SG,brands_tier2,brands,brand,Torriden,29.18,54.0,39.46,27.46,0.437,0.217,0.089,rising,2025-12-28
+SG,brands_tier1,brands,brand,CeraVe,52.73,100.0,75.69,54.46,0.39,0.381,0.138,rising,2025-12-28
+SG,brands_tier2,brands,brand,CeraVe,52.73,100.0,75.69,54.46,0.39,0.381,0.138,rising,2025-12-28
+SG,brands_tier1,brands,brand,Neutrogena,23.81,42.0,27.23,19.77,0.377,0.123,-0.126,rising,2025-12-28
+SG,brands_tier1,brands,brand,Cetaphil,43.2,67.0,53.77,41.23,0.304,0.157,0.053,rising,2025-12-28
+SG,brands_tier1,brands,brand,Laneige,58.86,87.0,63.15,50.23,0.257,0.054,-0.113,rising,2025-12-28
+SG,brands_tier2,brands,brand,COSRX,28.54,52.0,29.0,23.62,0.228,0.204,-0.263,rising,2025-12-28
+SG,brands_tier2,brands,brand,The Ordinary,51.64,82.0,63.15,55.0,0.148,0.23,0.084,stable,2025-12-28
+SG,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,7.58,59.0,8.69,3.31,1.628,,-0.756,rising,2025-12-28
+SG,cleanser_baseline,cleanser_oil_control,baseline,face wash,58.66,100.0,82.15,55.15,0.49,0.223,0.135,rising,2025-12-28
+SG,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,53.59,100.0,62.46,53.23,0.173,0.254,-0.063,stable,2025-12-28
+SG,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+SG,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+SG,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,28.4,100.0,61.46,21.92,1.804,0.233,1.017,rising,2025-12-28
+SG,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,59.9,100.0,79.46,52.85,0.504,0.186,0.037,rising,2025-12-28
+SG,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,1.5,54.0,4.15,0.0,,,-0.481,insufficient data,2025-12-28
+SG,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,1.33,50.0,3.85,0.0,,,-0.444,insufficient data,2025-12-28
+SG,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+SG,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,19.61,68.0,34.08,16.31,1.09,0.456,0.196,rising,2025-12-28
+SG,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,70.99,100.0,80.0,68.92,0.161,0.057,0.04,stable,2025-12-28
+SG,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,25.89,100.0,25.38,32.69,-0.224,-0.367,1.525,declining,2025-12-28
+SG,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,0.29,30.0,0.0,0.0,,-1.0,,insufficient data,2025-12-28
+SG,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TH,brands_tier1,brands,brand,La Roche-Posay,5.14,21.0,11.08,7.77,0.426,0.667,1.649,rising,2025-12-28
+TH,brands_tier2,brands,brand,The Ordinary,23.91,58.0,28.15,22.38,0.258,0.199,-0.062,rising,2025-12-28
+TH,brands_tier2,brands,brand,Anua,9.16,20.0,7.77,6.38,0.217,-0.115,-0.292,rising,2025-12-28
+TH,brands_tier1,brands,brand,CeraVe,60.75,100.0,57.31,47.77,0.2,-0.053,-0.192,stable,2025-12-28
+TH,brands_tier2,brands,brand,CeraVe,60.75,100.0,57.31,47.77,0.2,-0.053,-0.192,stable,2025-12-28
+TH,brands_tier1,brands,brand,Neutrogena,13.82,21.0,13.85,12.08,0.146,-0.034,-0.085,stable,2025-12-28
+TH,brands_tier2,brands,brand,COSRX,8.36,13.0,9.23,8.23,0.121,0.141,-0.038,stable,2025-12-28
+TH,brands_tier1,brands,brand,Cetaphil,13.46,22.0,15.23,14.15,0.076,0.151,0.045,stable,2025-12-28
+TH,brands_tier1,brands,brand,Laneige,15.76,29.0,12.15,11.38,0.068,-0.19,-0.278,stable,2025-12-28
+TH,brands_tier2,brands,brand,Torriden,5.11,14.0,9.85,9.23,0.067,0.494,2.366,stable,2025-12-28
+TH,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,3.04,57.0,11.85,3.23,2.667,,0.593,rising,2025-12-28
+TH,cleanser_baseline,cleanser_oil_control,baseline,face wash,36.44,100.0,69.46,37.69,0.843,0.534,0.551,rising,2025-12-28
+TH,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,53.67,100.0,60.23,56.62,0.064,0.04,0.14,stable,2025-12-28
+TH,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.41,43.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+TH,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TH,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,18.87,100.0,48.23,16.92,1.85,1.723,0.407,rising,2025-12-28
+TH,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,55.34,100.0,71.92,49.23,0.461,0.186,0.025,rising,2025-12-28
+TH,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,2.66,62.0,12.08,0.0,,1.532,2.65,insufficient data,2025-12-28
+TH,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,0.58,61.0,0.0,0.0,,-1.0,,insufficient data,2025-12-28
+TH,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TH,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,1.87,100.0,11.38,1.77,5.435,5.84,,rising,2025-12-28
+TH,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,0.39,21.0,2.38,0.77,2.1,,,rising,2025-12-28
+TH,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,59.37,100.0,79.15,53.31,0.485,0.089,0.146,rising,2025-12-28
+TH,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,0.1,11.0,0.0,0.0,,,-1.0,insufficient data,2025-12-28
+TH,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TW,brands_tier2,brands,brand,Anua,2.89,12.0,6.77,2.62,1.588,0.312,1.622,rising,2025-12-28
+TW,brands_tier1,brands,brand,Laneige,4.39,13.0,6.0,2.38,1.516,-0.155,0.067,rising,2025-12-28
+TW,brands_tier2,brands,brand,COSRX,7.16,13.0,9.08,4.54,1.0,0.099,-0.17,rising,2025-12-28
+TW,brands_tier1,brands,brand,Neutrogena,7.11,15.0,9.54,6.15,0.55,0.222,0.014,rising,2025-12-28
+TW,brands_tier1,brands,brand,Cetaphil,15.48,33.0,21.69,14.46,0.5,0.111,0.242,rising,2025-12-28
+TW,brands_tier2,brands,brand,The Ordinary,17.35,41.0,26.23,19.23,0.364,0.394,0.283,rising,2025-12-28
+TW,brands_tier1,brands,brand,CeraVe,62.92,100.0,78.62,58.0,0.355,0.09,0.086,rising,2025-12-28
+TW,brands_tier2,brands,brand,CeraVe,62.92,100.0,78.62,58.0,0.355,0.09,0.086,rising,2025-12-28
+TW,brands_tier2,brands,brand,Torriden,18.0,32.0,25.77,23.38,0.102,0.145,0.745,stable,2025-12-28
+TW,brands_tier1,brands,brand,La Roche-Posay,1.47,23.0,10.0,0.0,,5.5,36.5,insufficient data,2025-12-28
+TW,cleanser_baseline,cleanser_oil_control,baseline,face wash,21.94,100.0,60.92,1.31,45.588,0.814,0.235,rising,2025-12-28
+TW,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TW,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,7.21,100.0,20.0,0.0,,,-0.477,insufficient data,2025-12-28
+TW,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TW,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,0.7,74.0,5.69,0.0,,,,insufficient data,2025-12-28
+TW,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,23.5,100.0,51.62,13.46,2.834,0.555,0.314,rising,2025-12-28
+TW,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,4.06,100.0,23.62,0.0,,4.117,5.22,insufficient data,2025-12-28
+TW,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TW,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TW,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,0.57,60.0,0.0,0.0,,,,insufficient data,2025-12-28
+TW,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,31.65,100.0,59.85,24.23,1.47,0.375,0.339,rising,2025-12-28
+TW,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,0.0,0.0,0.0,0.0,,,,insufficient data,2025-12-28
+TW,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,1.58,100.0,12.77,0.0,,,,insufficient data,2025-12-28
+TW,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,0.57,60.0,0.0,0.0,,-1.0,,insufficient data,2025-12-28
+TW,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,0.62,65.0,0.0,0.0,,-1.0,,insufficient data,2025-12-28
+US,brands_tier1,brands,brand,Laneige,19.88,57.0,22.69,15.54,0.46,0.025,-0.092,rising,2025-12-28
+US,brands_tier1,brands,brand,Neutrogena,30.7,75.0,35.46,30.62,0.158,0.085,0.071,stable,2025-12-28
+US,brands_tier1,brands,brand,La Roche-Posay,6.04,34.0,12.08,10.69,0.129,1.161,1.198,stable,2025-12-28
+US,brands_tier2,brands,brand,The Ordinary,47.79,82.0,59.15,52.46,0.128,0.269,0.092,stable,2025-12-28
+US,brands_tier2,brands,brand,Anua,11.54,23.0,15.54,14.0,0.11,0.171,0.453,stable,2025-12-28
+US,brands_tier2,brands,brand,COSRX,9.33,21.0,10.54,9.62,0.096,0.248,-0.046,stable,2025-12-28
+US,brands_tier1,brands,brand,CeraVe,51.9,100.0,58.38,56.15,0.04,0.144,0.077,stable,2025-12-28
+US,brands_tier2,brands,brand,CeraVe,51.9,100.0,58.38,56.15,0.04,0.144,0.077,stable,2025-12-28
+US,brands_tier2,brands,brand,Torriden,1.7,4.0,2.38,2.38,0.0,0.17,0.825,stable,2025-12-28
+US,brands_tier1,brands,brand,Cetaphil,19.93,33.0,21.0,21.15,-0.007,0.07,0.048,stable,2025-12-28
+US,cleanser_subcategories,cleanser_oil_control,subcategory,double cleansing,9.4,15.0,10.08,9.54,0.056,0.133,-0.026,stable,2025-12-28
+US,cleanser_baseline,cleanser_oil_control,baseline,face wash,58.65,100.0,68.0,65.69,0.035,0.139,0.153,stable,2025-12-28
+US,cleanser_subcategories,cleanser_oil_control,subcategory,salicylic acid cleanser,24.41,59.0,30.38,30.62,-0.008,0.315,0.225,stable,2025-12-28
+US,cleanser_subcategories,cleanser_oil_control,subcategory,micellar water,67.61,100.0,74.08,76.38,-0.03,0.165,0.07,stable,2025-12-28
+US,cleanser_subcategories,cleanser_oil_control,subcategory,oil control cleanser,1.33,5.0,2.15,2.54,-0.152,1.542,0.604,stable,2025-12-28
+US,moisturizer_subcategories,moisturizer_hydration,subcategory,ceramide moisturizer,9.57,34.0,19.77,12.23,0.616,0.9,0.764,rising,2025-12-28
+US,moisturizer_subcategories,moisturizer_hydration,subcategory,barrier cream,50.77,100.0,79.62,57.77,0.378,0.255,0.547,rising,2025-12-28
+US,moisturizer_subcategories,moisturizer_hydration,subcategory,hydrating serum,37.9,65.0,50.38,40.92,0.231,0.136,0.31,rising,2025-12-28
+US,moisturizer_baseline,moisturizer_hydration,baseline,moisturizer,69.08,100.0,77.54,69.0,0.124,0.008,0.123,stable,2025-12-28
+US,moisturizer_subcategories,moisturizer_hydration,subcategory,skin flooding,2.9,22.0,6.92,7.54,-0.082,1.293,6.714,stable,2025-12-28
+US,sunscreen_subcategories,sunscreen_spf,subcategory,SPF moisturizer,25.9,38.0,22.15,25.77,-0.14,-0.19,0.07,stable,2025-12-28
+US,sunscreen_subcategories,sunscreen_spf,subcategory,tinted sunscreen,35.62,67.0,31.0,38.54,-0.196,-0.219,0.246,stable,2025-12-28
+US,sunscreen_subcategories,sunscreen_spf,subcategory,reef safe sunscreen,9.95,18.0,6.77,9.69,-0.302,-0.35,0.101,declining,2025-12-28
+US,sunscreen_baseline,sunscreen_spf,baseline,sunscreen,45.5,100.0,28.69,50.46,-0.431,-0.297,0.103,declining,2025-12-28
+US,sunscreen_subcategories,sunscreen_spf,subcategory,mineral sunscreen,43.0,100.0,30.23,54.15,-0.442,-0.252,0.326,declining,2025-12-28

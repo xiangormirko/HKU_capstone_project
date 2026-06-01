@@ -28,7 +28,15 @@ CATEGORY_KEYS = {
     "Moisturizer & Hydration": "moisturizer_hydration",
     "Sunscreen / SPF": "sunscreen_spf",
 }
-COUNTRY_NAMES = {"HK": "Hong Kong", "JP": "Japan"}
+COUNTRY_NAMES = {
+    "US": "United States", "GB": "United Kingdom", "AU": "Australia", "DE": "Germany",
+    "FR": "France", "JP": "Japan", "KR": "South Korea", "SG": "Singapore",
+    "HK": "Hong Kong", "TW": "Taiwan", "TH": "Thailand", "MY": "Malaysia", "PH": "Philippines",
+}
+BRANDS_KEY = "brands"
+DEFAULT_COUNTRY = "US"
+# preferred display order for the country tabs
+COUNTRY_ORDER = ["US", "GB", "AU", "DE", "FR", "JP", "KR", "SG", "HK", "TW", "TH", "MY", "PH"]
 
 
 def _num(v):
@@ -68,6 +76,23 @@ class TrendsData:
         m = dict(zip(df["date"], df["score"]))
         return [None if d not in m else int(m[d]) for d in dates]
 
+    def _order_countries(self, countries):
+        cs = set(countries)
+        ordered = [c for c in COUNTRY_ORDER if c in cs]
+        ordered += sorted(cs - set(ordered))
+        return ordered
+
+    def _dedup_brands(self, bm):
+        """Brand metrics span tier1/tier2 (with duplicates) — keep one row per
+        brand, the highest-scoring instance, sorted by avg_score."""
+        best = {}
+        for _, r in bm.iterrows():
+            kw = r["keyword"]
+            cur = best.get(kw)
+            if cur is None or (r.get("avg_score") or 0) > (cur.get("avg_score") or 0):
+                best[kw] = self._metric(r)
+        return sorted(best.values(), key=lambda s: s["avg_score"] or 0, reverse=True)
+
     # ---------- full block for the UI ----------
     def category_block(self, name):
         key = CATEGORY_KEYS.get(name)
@@ -75,10 +100,13 @@ class TrendsData:
             return {"available": False, "category": name}
         m = self.metrics[self.metrics["category"] == key]
         ts = self.ts[self.ts["category"] == key]
-        countries = sorted(m["country"].unique())
-        by_country = {c: self._country_block(c, m[m["country"] == c], ts[ts["country"] == c])
+        bm = self.metrics[self.metrics["category"] == BRANDS_KEY]    # brands (global)
+        bts = self.ts[self.ts["category"] == BRANDS_KEY]
+        countries = self._order_countries(set(m["country"]) | set(bm["country"]))
+        by_country = {c: self._country_block(c, m[m["country"] == c], ts[ts["country"] == c],
+                                             bm[bm["country"] == c], bts[bts["country"] == c])
                       for c in countries}
-        default = "JP" if "JP" in countries else (countries[0] if countries else None)
+        default = DEFAULT_COUNTRY if DEFAULT_COUNTRY in countries else (countries[0] if countries else None)
         latest = str(m["latest_date"].max()) if len(m) else None
         return {
             "available": True, "category": name, "trends_key": key,
@@ -87,28 +115,30 @@ class TrendsData:
             "source": "Google Trends — relative search interest (0–100), weekly",
         }
 
-    def _country_block(self, country, m, ts):
+    def _country_block(self, country, m, ts, bm, bts):
         baseline_m = m[m["type"] == "baseline"]
         baseline = self._metric(baseline_m.iloc[0]) if len(baseline_m) else None
 
-        dates = sorted(ts["date"].unique())
+        brands = self._dedup_brands(bm)                  # brand momentum (deduped, ranked)
+
+        # chart lines: category baseline + the 2 top brands' time series
+        dates = sorted(set(ts["date"]) | set(bts["date"]))
         lines = []
         b = ts[ts["type"] == "baseline"]
         if len(b):
             lines.append({"name": b.iloc[0]["keyword"], "role": "category",
                           "values": self._series(b, dates)})
-        for kw in sorted(ts[ts["type"] == "brand"]["keyword"].unique()):
-            bb = ts[(ts["type"] == "brand") & (ts["keyword"] == kw)]
-            lines.append({"name": kw, "role": "brand", "values": self._series(bb, dates)})
+        for br in brands[:2]:
+            bb = bts[bts["keyword"] == br["keyword"]]
+            if len(bb):
+                lines.append({"name": br["keyword"], "role": "brand",
+                              "values": self._series(bb, dates)})
 
         subs = [self._metric(r) for _, r in m[m["type"] == "subcategory"].iterrows()]
-        # rank rising terms: real momentum first, then growth; drop all-zero noise
         subs = [s for s in subs if (s["peak_score"] or 0) > 0]
         subs.sort(key=lambda s: (s["momentum_3m"] if s["momentum_3m"] is not None else -99,
                                  s["growth_yoy"] if s["growth_yoy"] is not None else -99),
                   reverse=True)
-        brands = [self._metric(r) for _, r in m[m["type"] == "brand"].iterrows()]
-        brands.sort(key=lambda s: s["avg_score"] or 0, reverse=True)
 
         return {"country": country, "country_name": COUNTRY_NAMES.get(country, country),
                 "baseline": baseline, "series": {"dates": dates, "lines": lines},
