@@ -16,6 +16,7 @@ trends source is unavailable the page still renders pain points.
 
 from fusion import get_fusion
 from amazon import get_amazon
+from analytics import get_data
 import refresh_manager
 
 # short, headline-friendly category labels
@@ -90,7 +91,32 @@ def _pain_points(n=5):
     return out
 
 
-def _brief(blue, pain):
+def _trade_markets(n=5):
+    """Fastest-growing cosmetics import markets (UN Comtrade) — the trade layer
+    on the landing page: where global demand is expanding fastest."""
+    try:
+        td = get_data()
+        markets = td.growing_import_markets(n=n)
+        monthly = td.monthly_summary()
+    except Exception:  # noqa: BLE001
+        return None
+    if not markets:
+        return None
+    return {
+        "markets": [{
+            "title": f"{m['flag']} {m['country']}",
+            "meta": (f"Cosmetics imports grew {m['yoy_pct']:+.1f}% to ${m['value_b']:.2f}B "
+                     f"(HS 3304) in {td.latest} — one of the fastest-rising destination markets."),
+            "metric": f"{m['yoy_pct']:+.0f}%",
+            "label": "Import YoY",
+            "country": m["country"],
+        } for m in markets],
+        "latest_year": td.latest,
+        "latest_month": monthly.get("latest_label") if monthly.get("available") else None,
+    }
+
+
+def _brief(blue, pain, trade):
     parts = []
     if pain:
         p = pain[0]
@@ -101,24 +127,32 @@ def _brief(blue, pain):
         b = blue[0]
         parts.append(f"Meanwhile <strong>{b['title']}</strong> is a clear blue-ocean gap, "
                      f"with demand up {b['metric']} across multiple markets.")
+    if trade and trade.get("markets"):
+        t = trade["markets"][0]
+        parts.append(f"On the trade side, <strong>{t['country']}</strong> is the "
+                     f"fastest-growing import market ({t['metric']} YoY).")
     return " ".join(parts) if parts else None
 
 
 def payload():
     blue = _blue_ocean()
     pain = _pain_points()
+    trade = _trade_markets()
     return {
-        "brief": _brief(blue, pain),
+        "brief": _brief(blue, pain, trade),
         "blue_ocean": blue,
         "pain_points": pain,
+        "trade": trade,
         "freshness": {
             "amazon": refresh_manager.status_for("amazon"),
             "trends": refresh_manager.status_for("trends"),
+            "trade": refresh_manager.status_for("trade"),
             "social": refresh_manager.status_for("social"),
         },
         "meta": {
             "note": ("Blue-ocean = sub-categories rising across markets (Google Trends). "
                      "Pain points = most-complained review aspects (Amazon). "
+                     "Trade = fastest-growing import markets (UN Comtrade HS 3304). "
                      "Recomputed on every load and on each data ingest."),
             "generated_at": refresh_manager.status().get("generated_at"),
         },

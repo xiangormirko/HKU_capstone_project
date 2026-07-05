@@ -48,6 +48,74 @@ class TradeData:
         self.years = sorted(set(self.exports["year"]) | set(self.imports["year"]))
         self.latest = self.years[-1]
         self.first = self.years[0]
+        # The newest annual year is often only partially reported (few countries
+        # filed yet), which would understate global totals. latest_complete is the
+        # last year whose country coverage holds up — used as the default display
+        # year so headline KPIs aren't skewed by an in-progress year.
+        self.latest_complete = self._latest_complete_year()
+        # optional rolling monthly totals (fresher than annual) — safe if absent
+        mpath = DATA_DIR / "monthly_trade.csv"
+        self.monthly = pd.read_csv(mpath) if mpath.exists() else None
+
+    def _latest_complete_year(self):
+        cov = self.exports.groupby("year")["iso3"].nunique().to_dict()
+        complete = self.years[0]
+        for y in self.years:
+            prev = cov.get(y - 1)
+            # a big coverage drop vs the prior year => year still filling in
+            if prev and cov.get(y, 0) < 0.75 * prev:
+                break
+            complete = y
+        return complete
+
+    # ---------- rolling monthly recency ----------
+    def monthly_summary(self):
+        """Most-recent month + a rolling global trend (from monthly_trade.csv).
+
+        The newest one or two months are usually only partially reported (few
+        countries), which would fake a sharp drop — so we keep only months whose
+        country coverage is at least 60% of the best-covered month."""
+        if self.monthly is None or self.monthly.empty:
+            return {"available": False}
+        m = self.monthly.copy()
+        m["period"] = m["period"].astype(str)
+        coverage = m.groupby("period")["iso3"].nunique()
+        cutoff = 0.6 * coverage.max()
+        periods = sorted(p for p in coverage.index if coverage[p] >= cutoff)
+        if not periods:
+            return {"available": False}
+        exp = (m[m.flow == "export"].groupby("period")["trade_value_usd"].sum())
+        imp = (m[m.flow == "import"].groupby("period")["trade_value_usd"].sum())
+        latest = periods[-1]
+        y, mo = int(latest[:4]), int(latest[4:6])
+        month_name = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                      "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][mo]
+        return {
+            "available": True,
+            "latest_period": latest,
+            "latest_label": f"{month_name} {y}",
+            "n_countries": int(coverage[latest]),
+            "global_export_b": round(float(exp.get(latest, 0)) / 1e9, 2),
+            "global_import_b": round(float(imp.get(latest, 0)) / 1e9, 2),
+            "series": {
+                "periods": periods,
+                "exports_b": [round(float(exp.get(p, 0)) / 1e9, 3) for p in periods],
+                "imports_b": [round(float(imp.get(p, 0)) / 1e9, 3) for p in periods],
+            },
+        }
+
+    def growing_import_markets(self, n=5, min_b=0.3):
+        """Sizeable import markets ranked by YoY growth — 'where demand is
+        rising' for the landing page. Uses the latest annual year."""
+        it = self.top("import", self.latest, 60)
+        growers = [r for r in it if r["yoy_pct"] is not None and r["value_b"] >= min_b]
+        growers.sort(key=lambda r: r["yoy_pct"], reverse=True)
+        out = []
+        for r in growers[:n]:
+            out.append({"country": r["country"], "iso3": r["iso3"], "flag": r["flag"],
+                        "value_b": r["value_b"], "yoy_pct": r["yoy_pct"],
+                        "rank": it.index(r) + 1})
+        return out
 
     # ---------- helpers ----------
     def _flow_df(self, flow):
@@ -173,27 +241,33 @@ class TradeData:
     # ---------- full dashboard payload ----------
     def build_payload(self, year=None):
         # year drives the "current" views (KPIs, top tables, map, matrix);
-        # trend charts always span all available years.
-        yr = int(year) if year and int(year) in self.years else self.latest
-        years = [str(y) for y in self.years]
+        # trend charts always span all available years. Default to the last
+        # complete year so headline totals aren't skewed by a partial newest year.
+        yr = int(year) if year and int(year) in self.years else self.latest_complete
+        # annual charts/axis span complete years only, so a partially-reported
+        # newest year doesn't show as a false end-of-series dip. The year selector
+        # still offers partial years (meta.all_years) as an explicit choice.
+        chart_years = [y for y in self.years if y <= self.latest_complete]
+        years = [str(y) for y in chart_years]
 
         def series(flow, names):
             df = self._flow_df(flow)
             d = {}
             for nm in names:
                 s = (df[df.country == nm].groupby("year")["trade_value_usd"].sum()
-                     .reindex(self.years))
+                     .reindex(chart_years))
                 d[nm] = [None if pd.isna(v) else round(v / 1e9, 3) for v in s.values]
             return d
 
         top_exp = self.top("export", yr, 10)
         top_imp = self.top("import", yr, 10)
 
-        # global volume per year
+        # KPI math needs every year (the selected year may be a partial one);
+        # the volume chart is trimmed to complete years only.
         ge = self.exports.groupby("year")["trade_value_usd"].sum().reindex(self.years)
         gi = self.imports.groupby("year")["trade_value_usd"].sum().reindex(self.years)
-        vol_exp = [round(v / 1e9, 2) if not pd.isna(v) else None for v in ge.values]
-        vol_imp = [round(v / 1e9, 2) if not pd.isna(v) else None for v in gi.values]
+        vol_exp = [round(ge.loc[y] / 1e9, 2) if not pd.isna(ge.loc[y]) else None for y in chart_years]
+        vol_imp = [round(gi.loc[y] / 1e9, 2) if not pd.isna(gi.loc[y]) else None for y in chart_years]
 
         # KPIs (for the selected year)
         cur_exp = ge.loc[yr]
@@ -216,6 +290,9 @@ class TradeData:
             "cagr_pct": cagr, "first_year": self.first, "latest_year": self.latest,
             "tracked_corridors": int(n_corridors),
         }
+        monthly = self.monthly_summary()
+        if monthly.get("available"):
+            kpis["latest_month_label"] = monthly["latest_label"]
 
         # bilateral matrix among the top exporters that are also tracked
         tracked = list(self.bilateral["exporter"].unique())
@@ -271,9 +348,13 @@ class TradeData:
             c["to_iso"] = name_iso.get(c["importer"])
 
         return {
-            "meta": {"hs_code": "3304", "years": years, "latest": str(self.latest),
+            "meta": {"hs_code": "3304", "years": years,
+                     "all_years": [str(y) for y in self.years], "latest": str(self.latest),
+                     "latest_complete": str(self.latest_complete),
+                     "partial_years": [str(y) for y in self.years if y > self.latest_complete],
                      "source": "UN Comtrade (official customs statistics)"},
             "kpis": kpis,
+            "monthly": monthly,
             "top_exporters": top_exp,
             "top_importers": top_imp,
             "export_trends": series("export", [r["country"] for r in top_exp]),

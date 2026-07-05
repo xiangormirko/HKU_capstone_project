@@ -1,5 +1,5 @@
 """
-CosmoTrade Intelligence backend.
+Product Scout backend.
 
 Routes
   GET  /            -> the dashboard (index.html)
@@ -245,9 +245,12 @@ def run_tool(name, args):
     try:
         if name == "list_available":
             return {"years": d.years, "latest_year": d.latest,
+                    "latest_complete_year": d.latest_complete,
+                    "note": (f"{d.latest} is still partially reported; use "
+                             f"{d.latest_complete} for complete annual totals."),
                     "regions": [r["region"] for r in d.region_breakdown()],
-                    "top_exporters": [r["country"] for r in d.top("export", n=15)],
-                    "top_importers": [r["country"] for r in d.top("import", n=15)]}
+                    "top_exporters": [r["country"] for r in d.top("export", d.latest_complete, n=15)],
+                    "top_importers": [r["country"] for r in d.top("import", d.latest_complete, n=15)]}
         if name == "top_countries":
             return d.top(args["flow"], args.get("year"), args.get("n", 10))
         if name == "country_profile":
@@ -347,6 +350,6 @@ def api_chat():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "8600"))
-    print(f"CosmoTrade running on http://localhost:{port}  (model: {MODEL}, "
+    print(f"Product Scout running on http://localhost:{port}  (model: {MODEL}, "
           f"AI {'ON' if os.environ.get('ANTHROPIC_API_KEY') else 'OFF — set ANTHROPIC_API_KEY'})")
     app.run(host="0.0.0.0", port=port, debug=False)

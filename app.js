@@ -1,5 +1,5 @@
 // ════════════════════════════════════════════════════════════════
-// CosmoTrade Intelligence — frontend
+// Product Scout — Trade Intelligence view (frontend)
 // All data is REAL, fetched from the backend (/api/data) which serves
 // UN Comtrade HS 3304 customs statistics. The AI panel talks to a real
 // Claude agent (/api/chat) that has tool access to the same dataset.
@@ -7,7 +7,7 @@
 
 const CHART_COLORS = ['#F97316','#FB923C','#0EA5E9','#EC4899','#F59E0B',
                       '#FB7185','#16A34A','#38BDF8','#94A3B8','#CBD5E1'];
-const fmtB = v => (v == null ? 'N/A' : '$' + Number(v).toFixed(2) + 'B');
+// esc(), stripHtml(), fmtB() are shared helpers from util.js (loaded first).
 
 let DATA = null;          // current payload
 let WORLD = null;         // topojson features (loaded once)
@@ -299,12 +299,25 @@ function render(payload) {
   document.querySelectorAll('.card-header .badge').forEach(b => {
     if (b.textContent.includes('est')) b.textContent = payload.kpis.year + ' actual';
   });
+  // rolling monthly recency badge (fresher than the annual snapshot)
+  const rec = document.getElementById('tradeRecency');
+  if (rec) {
+    const m = payload.monthly;
+    if (m && m.available) {
+      rec.textContent = `Customs data → ${m.latest_label}`;
+      rec.style.display = '';
+    } else {
+      rec.style.display = 'none';
+    }
+  }
 }
 
 // ───────────────────────── year selector ─────────────────────────
-function setupYearSelect(years, latest) {
+function setupYearSelect(years, latest, partialYears) {
   const sel = document.getElementById('yearSelect');
-  sel.innerHTML = years.slice().reverse().map(y => `<option value="${y}" ${y == latest ? 'selected' : ''}>${y}</option>`).join('');
+  const partial = new Set((partialYears || []).map(String));
+  sel.innerHTML = years.slice().reverse().map(y =>
+    `<option value="${y}" ${y == latest ? 'selected' : ''}>${y}${partial.has(String(y)) ? ' (partial)' : ''}</option>`).join('');
   sel.addEventListener('change', async () => {
     sel.disabled = true;
     try { render(await loadData(sel.value)); } catch (e) { console.error(e); }
@@ -350,17 +363,13 @@ function showTyping() {
 function removeTyping() { const el = document.getElementById('typingIndicator'); if (el) el.remove(); }
 
 async function handleQuery(query) {
-  addMessage('user', escapeHtml(query));
+  addMessage('user', esc(query));
   const sq = document.getElementById('suggestedQueries');
   if (sq) sq.style.display = 'none';
   chatHistory.push({ role: 'user', content: query });
   showTyping();
   try {
-    const res = await fetch('/api/chat', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: chatHistory }),
-    });
-    const data = await res.json();
+    const data = await postChat(chatHistory);
     removeTyping();
     const reply = data.reply || 'No response.';
     const el = addMessage('assistant', reply);
@@ -376,13 +385,10 @@ async function handleQuery(query) {
     else chatHistory.pop(); // drop the user turn so they can retry cleanly
   } catch (e) {
     removeTyping();
-    addMessage('assistant', '<strong>Connection error.</strong> Is the server running? ' + escapeHtml(String(e)));
+    addMessage('assistant', '<strong>Connection error.</strong> Is the server running? ' + esc(String(e)));
     chatHistory.pop();
   }
 }
-
-function escapeHtml(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
-function stripHtml(s) { const d = document.createElement('div'); d.innerHTML = s; return d.textContent; }
 
 document.getElementById('aiSend').addEventListener('click', () => {
   const input = document.getElementById('aiInput');
@@ -439,12 +445,12 @@ updateThemeIcon();
 (async function init() {
   try {
     const payload = await loadData();
-    setupYearSelect(payload.meta.years, payload.kpis.year);
+    setupYearSelect(payload.meta.all_years || payload.meta.years, payload.kpis.year, payload.meta.partial_years);
     render(payload);
   } catch (e) {
     console.error(e);
     document.querySelector('.kpi-row').innerHTML =
-      `<div style="grid-column:1/-1;color:var(--negative);padding:20px">Failed to load data: ${escapeHtml(String(e))}.<br>Make sure the backend is running (<code>python server.py</code>) and data is fetched (<code>python fetch_data.py</code>).</div>`;
+      `<div style="grid-column:1/-1;color:var(--negative);padding:20px">Failed to load data: ${esc(String(e))}.<br>Make sure the backend is running (<code>python server.py</code>) and data is fetched (<code>python fetch_data.py</code>).</div>`;
   }
   window.addEventListener('resize', () => { if (DATA) buildMap(DATA.map); });
 })();

@@ -6,9 +6,7 @@
 // ════════════════════════════════════════════════════════════════
 
 let homeLoaded = false;
-
-const hEsc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
-const hStrip = s => { const d = document.createElement('div'); d.innerHTML = s; return d.textContent; };
+// esc() and stripHtml() are shared helpers from util.js (loaded first).
 
 // ───────────────────────── load + render ─────────────────────────
 async function loadHome() {
@@ -18,7 +16,7 @@ async function loadHome() {
     d = await fetch('/api/home').then(r => r.json());
   } catch (e) {
     document.getElementById('blueList').innerHTML =
-      `<div class="hp-empty" style="color:var(--negative)">Failed to load: ${hEsc(String(e))}</div>`;
+      `<div class="hp-empty" style="color:var(--negative)">Failed to load: ${esc(String(e))}</div>`;
     return;
   }
   renderHome(d);
@@ -35,9 +33,9 @@ function renderHome(d) {
     document.getElementById('homeBriefText').innerHTML = d.brief;  // server-built, trusted
   }
 
-  // freshness bars (amazon + trends)
+  // freshness bars (trends + amazon + trade)
   const fr = d.freshness || {};
-  const bars = ['trends', 'amazon'].map(k => (fr[k] && window.freshBar) ? window.freshBar(fr[k]) : '').join('');
+  const bars = ['trends', 'amazon', 'trade'].map(k => (fr[k] && window.freshBar) ? window.freshBar(fr[k]) : '').join('');
   document.getElementById('homeFresh').innerHTML = bars;
 
   // lists
@@ -53,12 +51,25 @@ function renderHome(d) {
     ? pain.map((x, i) => itemHTML(x, i, 'red')).join('')
     : `<div class="hp-empty">No pain points yet — ingest review data to populate.</div>`;
 
+  // trade panel (UN Comtrade) — only shown when data is present
+  const trade = d.trade;
+  const tradePanel = document.getElementById('tradePanel');
+  if (trade && trade.markets && trade.markets.length) {
+    tradePanel.style.display = '';
+    const stamp = trade.latest_month
+      ? `to ${trade.latest_month} · ${trade.latest_year} annual`
+      : `${trade.latest_year} annual`;
+    document.getElementById('tradeStamp').textContent = stamp;
+    document.getElementById('tradeList').innerHTML = trade.markets.map((x, i) => itemHTML(x, i, 'trade')).join('');
+  } else {
+    tradePanel.style.display = 'none';
+  }
+
   // wire the per-item "Ask AI" buttons
-  document.querySelectorAll('#blueList .hp-ask, #redList .hp-ask').forEach(b =>
+  document.querySelectorAll('#blueList .hp-ask, #redList .hp-ask, #tradeList .hp-ask').forEach(b =>
     b.addEventListener('click', () => {
-      const q = b.dataset.q;
       hcSwitchToChat();
-      hcSend(q);
+      hcSend(b.dataset.q);
     }));
 
   // data-driven chat suggestions
@@ -67,29 +78,33 @@ function renderHome(d) {
   if (pain[0]) sugg.push(`How do I solve the "${pain[0].title}" pain point?`);
   sugg.push("What's the single biggest opportunity right now?");
   document.getElementById('hcSuggest').innerHTML =
-    sugg.map(s => `<button class="hc-chip">${hEsc(s)}</button>`).join('');
+    sugg.map(s => `<button class="hc-chip">${esc(s)}</button>`).join('');
   document.querySelectorAll('#hcSuggest .hc-chip').forEach(c =>
     c.addEventListener('click', () => hcSend(c.textContent)));
 
   if (d.meta && d.meta.note)
-    document.getElementById('homeNote').innerHTML = `<strong>How this is built:</strong> ${hEsc(d.meta.note)}`;
+    document.getElementById('homeNote').innerHTML = `<strong>How this is built:</strong> ${esc(d.meta.note)}`;
 }
 
-function itemHTML(x, i, cls) {
-  const ask = cls === 'blue'
-    ? `Give me a launch brief for "${x.title}" — a rising blue-ocean opportunity in ${x.category}.`
-    : `How can a new product solve the "${x.title}" pain point? What do consumers complain about and how do I differentiate?`;
+function itemHTML(x, i, kind) {
+  const valClass = kind === 'blue' ? 'blue' : kind === 'trade' ? 'green' : 'red';
+  const ask =
+    kind === 'blue'
+      ? `Give me a launch brief for "${x.title}" — a rising blue-ocean opportunity in ${x.category}.`
+      : kind === 'trade'
+      ? `${x.country} is a fast-growing cosmetics import market. What's driving the demand and what products should I sell there?`
+      : `How can a new product solve the "${x.title}" pain point? What do consumers complain about and how do I differentiate?`;
   return `
     <div class="hp-item ${i === 0 ? 'r1' : ''}">
       <div class="hp-rank">${i + 1}</div>
       <div class="hp-body">
-        <div class="hp-name">${hEsc(x.title)}</div>
-        <div class="hp-meta">${hEsc(x.meta)}</div>
-        <button class="hp-ask" data-q="${hEsc(ask)}">Ask AI →</button>
+        <div class="hp-name">${esc(x.title)}</div>
+        <div class="hp-meta">${esc(x.meta)}</div>
+        <button class="hp-ask" data-q="${esc(ask)}">Ask AI →</button>
       </div>
       <div class="hp-metric">
-        <div class="hp-val ${cls}">${hEsc(x.metric)}</div>
-        <span class="hp-tag">${hEsc(x.label)}</span>
+        <div class="hp-val ${valClass}">${esc(x.metric)}</div>
+        <span class="hp-tag">${esc(x.label)}</span>
       </div>
     </div>`;
 }
@@ -126,16 +141,12 @@ async function hcSend(text) {
   if (!text) return;
   const sendBtn = document.getElementById('hcSend');
   document.getElementById('hcSuggest').style.display = 'none';
-  hcAdd('user', hEsc(text));
+  hcAdd('user', esc(text));
   homeChatHistory.push({ role: 'user', content: text });
   sendBtn.disabled = true;
   hcTyping();
   try {
-    const res = await fetch('/api/chat', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: homeChatHistory }),
-    });
-    const data = await res.json();
+    const data = await postChat(homeChatHistory);
     hcRemoveTyping();
     const reply = data.reply || 'No response.';
     const el = hcAdd('ai', reply);
@@ -146,11 +157,11 @@ async function hcSend(text) {
       note.textContent = '⚙ queried: ' + names;
       el.querySelector('.hc-bubble').appendChild(note);
     }
-    if (!data.needs_key && !data.error) homeChatHistory.push({ role: 'assistant', content: hStrip(reply) });
+    if (!data.needs_key && !data.error) homeChatHistory.push({ role: 'assistant', content: stripHtml(reply) });
     else homeChatHistory.pop();
   } catch (e) {
     hcRemoveTyping();
-    hcAdd('ai', '<strong>Connection error.</strong> Is the server running? ' + hEsc(String(e)));
+    hcAdd('ai', '<strong>Connection error.</strong> Is the server running? ' + esc(String(e)));
     homeChatHistory.pop();
   }
   sendBtn.disabled = false;

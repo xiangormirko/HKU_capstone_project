@@ -3,11 +3,7 @@
 // Talks to /api/social/* (Reddit now; Google Trends / others later).
 // ════════════════════════════════════════════════════════════════
 
-const sentClass = label =>
-  (label || '').includes('positive') ? 'sent-pos' :
-  (label || '').includes('negative') ? 'sent-neg' : 'sent-neu';
-
-const esc = s => { const d = document.createElement('div'); d.textContent = s == null ? '' : s; return d.innerHTML; };
+// esc() and sentClass() are shared helpers from util.js (loaded first).
 
 let SOCIAL_OV = null;
 let socialLoaded = false;

@@ -6,3 +6,4 @@ pycountry>=23.12
 pycountry-convert>=0.7
 vaderSentiment>=3.3
 apscheduler>=3.10
+pytest>=8.0

@@ -79,9 +79,11 @@ class Fusion:
     def __init__(self):
         self.social = get_social()
         self.trade = get_data()
-        # trade export metrics by country name (latest year)
-        self._exp = {r["country"]: r for r in self.trade.top("export", n=400)}
-        self._imp = {r["country"]: r for r in self.trade.top("import", n=400)}
+        # use the last fully-reported year for all trade lookups (the newest year
+        # is often only partially filed, which would distort ranks and totals)
+        self._tyear = getattr(self.trade, "latest_complete", self.trade.latest)
+        self._exp = {r["country"]: r for r in self.trade.top("export", self._tyear, n=400)}
+        self._imp = {r["country"]: r for r in self.trade.top("import", self._tyear, n=400)}
         # category -> dominant consumer skin segment (US share), from Statista
         self._skin = {}
         try:
@@ -178,7 +180,7 @@ class Fusion:
         r = self._exp.get(country)
         if not r:
             return None
-        rank = next((i + 1 for i, x in enumerate(self.trade.top("export", n=400))
+        rank = next((i + 1 for i, x in enumerate(self.trade.top("export", self._tyear, n=400))
                      if x["country"] == country), None)
         cagr = self.trade.trend(country, "export").get("cagr_pct")
         return {"export_b": r["value_b"], "export_yoy": r["yoy_pct"],
@@ -242,7 +244,9 @@ class Fusion:
     # ---------- WHERE TO SELL ----------
     def sell_to_markets(self, n=8, min_import_b=0.3):
         """Net-importer countries (imports >> exports) = unmet cosmetics demand."""
-        yr = self.trade.latest
+        # use the last fully-reported year so partial newest-year data doesn't
+        # drop major importers from the net-import ranking
+        yr = getattr(self.trade, "latest_complete", self.trade.latest)
         ex = (self.trade.exports[self.trade.exports.year == yr]
               .groupby("country")["trade_value_usd"].sum())
         im = (self.trade.imports[self.trade.imports.year == yr]
@@ -382,7 +386,7 @@ class Fusion:
             "category_opportunities": cats,
             "emerging_formats": self.emerging_formats(),
             "meta": {
-                "trade_year": self.trade.latest,
+                "trade_year": getattr(self.trade, "latest_complete", self.trade.latest),
                 "social_posts": self.social.meta.get("n_posts"),
                 "signals": ["Reddit demand+sentiment", "Amazon review pain points",
                             "Google Trends momentum (13 markets)", "UN Comtrade HS 3304 trade",

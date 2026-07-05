@@ -6,7 +6,7 @@
 window.fusionLoaded = false;
 
 const ANGLE_CLS = { "Unmet need": "whitespace", "Room to differentiate": "differentiate", "Validated demand": "validated" };
-const sb = v => (v == null ? "n/a" : "$" + Number(v).toFixed(1) + "B");
+// esc() and sb() are shared helpers from util.js (loaded first).
 
 window.loadFusion = async function loadFusion() {
   window.fusionLoaded = true;

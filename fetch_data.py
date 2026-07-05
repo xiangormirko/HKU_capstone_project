@@ -16,6 +16,7 @@ we go straight to the public source — no scraping, no paywall.
 
 import time
 import sys
+import datetime
 import requests
 import pandas as pd
 import pycountry
@@ -25,9 +26,30 @@ from pathlib import Path
 DATA_DIR = Path(__file__).parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
 
-PREVIEW_URL = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
+ANNUAL_URL = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
+MONTHLY_URL = "https://comtradeapi.un.org/public/v1/preview/C/M/HS"
+PREVIEW_URL = ANNUAL_URL  # back-compat
 HS_CODE = "3304"
-YEARS = [2018, 2019, 2020, 2021, 2022, 2023, 2024]
+
+# Annual coverage. Bump END_YEAR as UN Comtrade publishes newer years; an
+# empty/unpublished year is simply skipped, so it's safe to look ahead.
+START_YEAR, END_YEAR = 2018, 2025
+YEARS = list(range(START_YEAR, END_YEAR + 1))
+
+
+def _recent_months(n=15):
+    """Last `n` calendar months as YYYYMM ints, oldest first (for the rolling
+    monthly trend). Months Comtrade hasn't published yet return no data and are
+    dropped downstream."""
+    d = datetime.date.today().replace(day=1)
+    out = []
+    for _ in range(n):
+        out.append(d.year * 100 + d.month)
+        d = (d.replace(day=1) - datetime.timedelta(days=1)).replace(day=1)
+    return sorted(out)
+
+
+MONTHS = _recent_months(15)
 
 # Major cosmetics exporters (Comtrade M49 codes) — used for bilateral flows,
 # which the free 500-row/call preview can only return one reporter at a time.
@@ -71,10 +93,20 @@ def country_meta(iso3):
         return None, "Other"
 
 
-def get(params):
-    r = requests.get(PREVIEW_URL, params=params, timeout=60)
-    r.raise_for_status()
-    return r.json().get("data", [])
+def get(params, url=ANNUAL_URL, tries=5):
+    """GET with exponential backoff on 429 (the free preview is rate-limited)."""
+    delay = 1.5
+    for attempt in range(tries):
+        r = requests.get(url, params=params, timeout=60)
+        if r.status_code == 429:
+            if attempt == tries - 1:
+                r.raise_for_status()
+            time.sleep(delay)
+            delay *= 2
+            continue
+        r.raise_for_status()
+        return r.json().get("data", [])
+    return []
 
 
 def load_country_lookup():
@@ -133,6 +165,47 @@ def fetch_bilateral():
     return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
 
 
+def fetch_monthly(flow):
+    """World-total value per reporter per MONTH (partner = World), for the last
+    ~15 months. One call per month keeps each response under the 500-row cap."""
+    frames = []
+    for period in MONTHS:
+        params = {
+            "reporterCode": "", "period": str(period), "partnerCode": "0",
+            "cmdCode": HS_CODE, "flowCode": flow, "partner2Code": "0",
+            "customsCode": "C00", "motCode": "0",
+        }
+        try:
+            data = get(params, url=MONTHLY_URL)
+        except Exception as e:  # noqa: BLE001
+            print(f"  {period}: FAILED ({e})")
+            continue
+        if data:
+            print(f"  {period}: {len(data)} countries")
+            frames.append(pd.DataFrame(data))
+        time.sleep(0.5)
+    return pd.concat(frames, ignore_index=True) if frames else pd.DataFrame()
+
+
+def tidy_monthly(df, lookup, flow):
+    if df.empty:
+        return df
+    period = df["period"].astype(str)
+    out = pd.DataFrame({
+        "period": period,
+        "year": period.str[:4].astype(int),
+        "month": period.str[4:6].astype(int),
+        "code": df["reporterCode"],
+        "flow": "export" if flow == "X" else "import",
+        "trade_value_usd": pd.to_numeric(df["primaryValue"], errors="coerce"),
+    })
+    out["country"] = out["code"].map(lambda c: lookup.get(int(c), ("?", None))[0])
+    out["iso3"] = out["code"].map(lambda c: lookup.get(int(c), ("?", None))[1])
+    out = out.dropna(subset=["trade_value_usd"])
+    out = out[(out["trade_value_usd"] > 0) & (out["iso3"].notna())]
+    return out
+
+
 def tidy_totals(df, lookup, who_col):
     out = pd.DataFrame({
         "year": df["refYear"],
@@ -180,6 +253,18 @@ def main():
     bt = bt.dropna(subset=["trade_value_usd"])
     bt.drop(columns=["importer_code"]).to_csv(DATA_DIR / "bilateral.csv", index=False)
     print(f"  -> {len(bt):,} bilateral rows")
+
+    print("\nFetching MONTHLY WORLD TOTALS (rolling recency) ...")
+    mx = tidy_monthly(fetch_monthly("X"), lookup, "X")
+    mm = tidy_monthly(fetch_monthly("M"), lookup, "M")
+    monthly = pd.concat([mx, mm], ignore_index=True)
+    if not monthly.empty:
+        monthly = monthly.drop(columns=["code"])
+        monthly.to_csv(DATA_DIR / "monthly_trade.csv", index=False)
+        span = f"{monthly['period'].min()}–{monthly['period'].max()}"
+        print(f"  -> {len(monthly):,} monthly rows, {span}")
+    else:
+        print("  -> no monthly data returned (skipped)")
 
     if exp.empty or imp.empty:
         print("\nWARNING: missing world totals — check connection.", file=sys.stderr)

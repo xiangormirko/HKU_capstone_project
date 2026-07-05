@@ -417,6 +417,10 @@
   .hp-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
   .hp-dot.blue { background:#0EA5E9; }
   .hp-dot.red { background:var(--negative); }
+  .hp-dot.green { background:var(--positive); }
+  .home-trade { margin-top:22px; }
+  .hp-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:2px 24px; margin-top:6px; }
+  .hp-val.green { color:var(--positive); }
   .hp-pill { font-size:11px; font-weight:500; color:var(--text2); background:var(--surface2); border:1px solid var(--border); border-radius:20px; padding:2px 9px; }
   .hp-sub { font-size:12px; color:var(--text2); margin:6px 0 6px; line-height:1.5; }
   .hp-list { margin-top:6px; }
@@ -796,6 +800,7 @@
   <div class="header-right">
     <button class="theme-toggle" id="themeToggle" title="Toggle dark / light theme" aria-label="Toggle theme"></button>
     <div class="header-controls" id="tradeControls" style="display:none">
+      <div class="hs-badge" id="tradeRecency" style="display:none"></div>
       <div class="hs-badge">HS 3304 — Beauty/Makeup Preparations</div>
       <select class="year-select" id="yearSelect">
         <option value="2024" selected>2024</option>
@@ -837,6 +842,16 @@
         <div class="hp-sub">The most-complained product aspects from real reviews — gaps a better product can win.</div>
         <div id="redList" class="hp-list"><div class="hp-empty">Loading…</div></div>
       </div>
+    </div>
+
+    <!-- ── global trade signals (UN Comtrade) ── -->
+    <div class="home-panel home-trade" id="tradePanel" style="display:none">
+      <div class="home-panel-head">
+        <div class="hp-title"><span class="hp-dot green"></span> Where Global Demand Is Growing</div>
+        <span class="hp-pill" id="tradeStamp">—</span>
+      </div>
+      <div class="hp-sub">Fastest-growing cosmetics import markets from official customs data (UN Comtrade, HS 3304) — where to sell into rising demand.</div>
+      <div id="tradeList" class="hp-grid"></div>
     </div>
 
     <!-- ── embedded AI chat ── -->
@@ -1079,6 +1094,7 @@
 </div>
 <button class="ai-fab" id="aiFab" title="Ask Product Scout AI" aria-label="Open AI assistant"><svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><path d="M12 2l1.7 5.1a3 3 0 0 0 1.9 1.9L20.7 11l-5.1 1.7a3 3 0 0 0-1.9 1.9L12 19.7l-1.7-5.1a3 3 0 0 0-1.9-1.9L3.3 11l5.1-1.7a3 3 0 0 0 1.9-1.9L12 2z"/></svg></button>
 
+<script src="util.js"></script>
 <script src="freshness.js"></script>
 <script src="app.js"></script>
 <script src="social.js"></script>
