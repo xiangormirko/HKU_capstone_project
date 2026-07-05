@@ -43,8 +43,14 @@ async function loadSocialOverview() {
   document.querySelectorAll('#exampleChips .chip').forEach(c =>
     c.addEventListener('click', () => runSearch(c.dataset.q)));
 
+  // social data freshness (last fetched + next refresh + fetch-latest)
+  const freshEl = document.getElementById('socialFresh');
+  if (freshEl && window.freshBar) freshEl.innerHTML = window.freshBar(SOCIAL_OV.freshness);
+
   renderOverview();
 }
+// allow the freshness widget to refresh the overview after a successful pull
+window.refreshSocialOverview = function () { socialLoaded = false; loadSocialOverview(); };
 
 function pill(name, label, cls) {
   return `<span class="product-pill"><span class="dot ${sentClass(label)}"></span>${esc(name)}

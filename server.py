@@ -23,11 +23,21 @@ from fusion import get_fusion
 from amazon import get_amazon
 from trends import get_trends
 import skin_types
+import home as home_mod
+import refresh_manager
 
 HERE = Path(__file__).parent
 MODEL = os.environ.get("MODEL", "claude-sonnet-4-6")
 
 app = Flask(__name__)
+
+# Optionally run the recurring-refresh scheduler inside the app process.
+if os.environ.get("PS_ENABLE_SCHEDULER") == "1":
+    try:
+        import scheduler_app
+        scheduler_app.start_in_app()
+    except Exception as _e:  # noqa: BLE001
+        print("Scheduler not started:", _e)
 
 # ───────────────────────── static + data ─────────────────────────
 @app.route("/")
@@ -55,10 +65,18 @@ def api_data():
     return jsonify(get_data().build_payload(request.args.get("year")))
 
 
+@app.route("/api/home")
+def api_home():
+    """Landing dashboard: blue-ocean whitespace + consumer pain points, live."""
+    return jsonify(home_mod.payload())
+
+
 # ───────── Social discovery (Reddit + future sources) ─────────
 @app.route("/api/social/overview")
 def api_social_overview():
-    return jsonify(get_social().overview())
+    ov = get_social().overview()
+    ov["freshness"] = refresh_manager.status_for("social")
+    return jsonify(ov)
 
 
 @app.route("/api/social/search")
@@ -70,7 +88,26 @@ def api_social_search():
 
 @app.route("/api/social/category")
 def api_social_category():
-    return jsonify(get_social().category_page(request.args.get("name", "")))
+    payload = get_social().category_page(request.args.get("name", ""))
+    payload["freshness"] = {
+        "trends": refresh_manager.status_for("trends"),
+        "amazon": refresh_manager.status_for("amazon"),
+        "social": refresh_manager.status_for("social"),
+    }
+    return jsonify(payload)
+
+
+# ───────── Data freshness + recurring/triggered refresh ─────────
+@app.route("/api/freshness")
+def api_freshness():
+    return jsonify(refresh_manager.status())
+
+
+@app.route("/api/refresh", methods=["POST"])
+def api_refresh():
+    body = request.get_json(silent=True) or {}
+    source = body.get("source") or request.args.get("source", "")
+    return jsonify(refresh_manager.trigger(source, body.get("query")))
 
 
 # ───────── Source-to-Sell fusion (trade x social) ─────────

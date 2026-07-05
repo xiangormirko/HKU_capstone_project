@@ -26,6 +26,9 @@ from collections import Counter, defaultdict
 
 from social import get_social
 from analytics import get_data
+from amazon import get_amazon
+from trends import get_trends
+import skin_types
 
 # Brand -> trade country-of-origin (names match the Comtrade dataset exactly).
 BRAND_ORIGIN = {
@@ -79,6 +82,96 @@ class Fusion:
         # trade export metrics by country name (latest year)
         self._exp = {r["country"]: r for r in self.trade.top("export", n=400)}
         self._imp = {r["country"]: r for r in self.trade.top("import", n=400)}
+        # category -> dominant consumer skin segment (US share), from Statista
+        self._skin = {}
+        try:
+            for s in skin_types.agent_summary()["segments"]:
+                rc = s.get("related_category")
+                if rc and (rc not in self._skin or s["approx_all_pct"] > self._skin[rc]["pct"]):
+                    self._skin[rc] = {"skin_type": s["skin_type"], "pct": s["approx_all_pct"]}
+        except Exception:  # noqa: BLE001
+            pass
+
+    # ---------- Amazon (unmet need) + Trends (demand momentum) helpers ----------
+    def _amazon_signal(self, category):
+        """Top review pain point (= unmet need) + best-in-class + a real complaint."""
+        try:
+            d = get_amazon().category(category)
+        except Exception:  # noqa: BLE001
+            return None
+        if not d.get("available"):
+            return None
+        sm = d["summary"]
+        voc = (d.get("voice_of_customer") or {}).get("negative") or []
+        return {
+            "pain_point": sm.get("top_painpoint"),          # {name, neg_rate, mentions}
+            "best_in_class": sm.get("best_product"),
+            "avg_rating": sm.get("avg_rating_weighted"),
+            "complaint": (voc[0]["text"][:160] + "…") if voc and voc[0].get("text") else None,
+            "complaint_brand": voc[0]["brand"] if voc else None,
+        }
+
+    def _demand_markets(self, category):
+        """Markets where THIS category's search interest is rising / declining,
+        plus its rising sub-categories (Google Trends). Sharper than HS-3304 net
+        imports because it is category- AND country-specific."""
+        try:
+            block = get_trends().category_block(category)
+        except Exception:  # noqa: BLE001
+            return None
+        if not block.get("available"):
+            return None
+        rising, declining, subs = [], [], Counter()
+        sub_mom = defaultdict(list)
+        for code, cb in block["by_country"].items():
+            base = cb.get("baseline") or {}
+            tl, m3 = base.get("trend_label"), base.get("momentum_3m")
+            row = {"market": cb["country_name"], "code": code, "momentum_3m": m3,
+                   "yoy": base.get("growth_yoy")}
+            if tl == "rising":
+                rising.append(row)
+            elif tl == "declining":
+                declining.append(cb["country_name"])
+            for s in cb.get("rising_subcategories", []):
+                if s.get("trend_label") == "rising" and s.get("momentum_3m") is not None:
+                    subs[s["keyword"]] += 1
+                    sub_mom[s["keyword"]].append(s["momentum_3m"])
+        rising.sort(key=lambda r: r["momentum_3m"] or 0, reverse=True)
+        emerging = [{"format": kw, "markets": subs[kw],
+                     "avg_momentum": round(sum(sub_mom[kw]) / len(sub_mom[kw]), 2)}
+                    for kw, _ in subs.most_common(3)]
+        return {"rising": rising[:5], "declining": declining, "emerging_formats": emerging}
+
+    def emerging_formats(self):
+        """Cross-market new-product whitespace: rising sub-categories ranked by how
+        many markets they're rising in (Google Trends)."""
+        try:
+            trends = get_trends()
+            cats = trends.available_categories()
+        except Exception:  # noqa: BLE001
+            return []
+        agg = {}
+        for name in cats:
+            try:
+                block = trends.category_block(name)
+            except Exception:  # noqa: BLE001
+                continue
+            if not block.get("available"):
+                continue
+            for code, cb in block["by_country"].items():
+                for s in cb.get("rising_subcategories", []):
+                    if s.get("trend_label") == "rising" and s.get("momentum_3m") is not None:
+                        d = agg.setdefault((name, s["keyword"]),
+                                           {"markets": set(), "mom": []})
+                        d["markets"].add(cb["country_name"])
+                        d["mom"].append(s["momentum_3m"])
+        out = [{"format": kw, "category": cat,
+                "markets_rising": sorted(v["markets"]), "n_markets": len(v["markets"]),
+                "avg_momentum": round(sum(v["mom"]) / len(v["mom"]), 2),
+                "pain_point": (self._amazon_signal(cat) or {}).get("pain_point")}
+               for (cat, kw), v in agg.items()]
+        out.sort(key=lambda x: (x["n_markets"], x["avg_momentum"]), reverse=True)
+        return out[:8]
 
     # ---------- trade helpers ----------
     def _export_metrics(self, country):
@@ -206,25 +299,67 @@ class Fusion:
                 origins.append({"origin": origin, "tagline": ORIGIN_TAGLINE.get(origin, origin),
                                 "weight": cnt, "export_b": tm.get("export_b"),
                                 "export_rank": tm.get("export_rank")})
+            amz = self._amazon_signal(cat)              # unmet need (Amazon reviews)
+            dem = self._demand_markets(cat)             # rising/declining markets (Trends)
+            skin = self._skin.get(cat)                  # addressable skin segment (Statista)
+
+            # Where to sell: prefer category-specific rising-demand markets (Trends);
+            # fall back to category-agnostic HS-3304 net importers (trade).
+            if dem and dem["rising"]:
+                sell_to = [{"country": r["market"], "momentum_3m": r["momentum_3m"],
+                            "yoy": r["yoy"], "basis": "search demand rising"}
+                           for r in dem["rising"][:5]]
+            else:
+                sell_to = [{"country": s["country"], "net_import_b": s["net_import_b"],
+                            "import_yoy": s["import_yoy"], "basis": "net cosmetics imports"}
+                           for s in sell]
+
+            # corroboration: social + sentiment always present, then each extra dataset
+            n_signals = 2 + sum(bool(x) for x in (origins, amz, dem, skin))
+
             out.append({
                 "category": cat, "angle": o["angle"],
                 "n_posts": o["n_posts"], "avg_sentiment": o["avg_sentiment"],
                 "sentiment_label": o["sentiment_label"],
                 "top_brands": [b for b, _ in cat_brands.get(cat, Counter()).most_common(4)],
                 "source_from": origins,
-                "sell_to": [{"country": s["country"], "net_import_b": s["net_import_b"],
-                             "import_yoy": s["import_yoy"]} for s in sell],
+                "sell_to": sell_to,
+                "sell_basis": sell_to[0]["basis"] if sell_to else None,
+                "unmet_need": amz["pain_point"] if amz else None,
+                "best_in_class": amz["best_in_class"] if amz else None,
+                "complaint": amz["complaint"] if amz else None,
+                "complaint_brand": amz["complaint_brand"] if amz else None,
+                "addressable_segment": skin,
+                "declining_markets": (dem or {}).get("declining") or [],
+                "emerging_formats": (dem or {}).get("emerging_formats") or [],
+                "n_signals": n_signals,
             })
+        # surface the most-corroborated opportunities first
+        out.sort(key=lambda c: (c["n_signals"], c["n_posts"]), reverse=True)
         return out
 
-    # ---------- bundle ----------
-    def payload(self):
-        origins = self.sourcing_origins()
-        sell = self.sell_to_markets(n=8)
+    def _headline(self, origins, sell, cats):
+        """Lead with the single best cross-signal opportunity if we have one
+        (category × unmet need × rising market × source), else the sourcing story."""
+        best = next((c for c in cats if c.get("unmet_need") and c.get("source_from")
+                     and c["sell_to"]), None)
+        if best:
+            pp = best["unmet_need"]
+            src = best["source_from"][0]
+            mkt = best["sell_to"][0]
+            seg = best.get("addressable_segment")
+            seg_txt = (f" for the {seg['skin_type'].lower()}-skin segment (~{seg['pct']}% of consumers)"
+                       if seg else "")
+            return (
+                f"Top opportunity: a {best['category']} product that fixes "
+                f"<strong>{pp['name']}</strong> — {pp['neg_rate']:.0f}% of Amazon reviews "
+                f"({pp['mentions']:,} mentions) complain about it{seg_txt}. "
+                f"Source from {src['tagline']} ({src['origin']}); sell into "
+                f"{mkt['country']} where {best['sell_basis']}."
+            )
         top_origin = origins[0] if origins else None
-        headline = None
         if top_origin and sell:
-            headline = (
+            return (
                 f"{top_origin['tagline']} ({top_origin['origin']}) is the strongest sourcing "
                 f"signal — {top_origin['social_mentions']} social mentions across "
                 f"{top_origin['n_brands']} brands ({top_origin['sentiment_label']}) and "
@@ -233,16 +368,29 @@ class Fusion:
                 + f". Biggest unmet-demand market to sell into: {sell[0]['country']} "
                 f"(${sell[0]['net_import_b']:.1f}B net imports)."
             )
+        return None
+
+    # ---------- bundle ----------
+    def payload(self):
+        origins = self.sourcing_origins()
+        sell = self.sell_to_markets(n=8)
+        cats = self.category_opportunities()
         return {
-            "headline": headline,
+            "headline": self._headline(origins, sell, cats),
             "sourcing_origins": origins,
             "sell_to_markets": sell,
-            "category_opportunities": self.category_opportunities(),
+            "category_opportunities": cats,
+            "emerging_formats": self.emerging_formats(),
             "meta": {
                 "trade_year": self.trade.latest,
                 "social_posts": self.social.meta.get("n_posts"),
+                "signals": ["Reddit demand+sentiment", "Amazon review pain points",
+                            "Google Trends momentum (13 markets)", "UN Comtrade HS 3304 trade",
+                            "Statista skin-type segments"],
                 "note": "Trade = UN Comtrade HS 3304 (country-level, all beauty/make-up prep). "
-                        "Social = Reddit brand/category mentions + sentiment. Linked via brand origin.",
+                        "Social = Reddit brand/category mentions + sentiment. Amazon = review "
+                        "aspect pain points. Trends = category search momentum by market. "
+                        "Linked via brand origin + category.",
             },
         }
 

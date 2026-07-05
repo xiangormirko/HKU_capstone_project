@@ -2,8 +2,8 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "cosmotrade",
-      "runtimeExecutable": "python3",
+      "name": "product-scout",
+      "runtimeExecutable": "/Users/xiangzhao/Desktop/cosmetics-trade-viz/.venv/bin/python",
       "runtimeArgs": ["server.py"],
       "port": 8600
     }

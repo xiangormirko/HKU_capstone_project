@@ -43,8 +43,9 @@ function renderCategoryPage(box, d) {
       </div>
     </div>`;
 
-  html += amazonModule(d.amazon);
-  html += trendsModule(d.trends);
+  const fr = d.freshness || {};
+  html += amazonModule(d.amazon, fr.amazon);
+  html += trendsModule(d.trends, fr.trends);
   html += redditModule(d.reddit);
 
   box.innerHTML = html;
@@ -55,7 +56,7 @@ function renderCategoryPage(box, d) {
 }
 
 // ───────────────────────── Amazon module ─────────────────────────
-function amazonModule(a) {
+function amazonModule(a, fr) {
   if (!a || !a.available) {
     return `<div class="module">
       <div class="module-head"><h3>Amazon Reviews Intelligence</h3><span class="src-badge sample">not yet ingested</span></div>
@@ -132,6 +133,7 @@ function amazonModule(a) {
 
   return `<div class="module">
     <div class="module-head"><h3>Amazon Reviews Intelligence</h3><span class="src-badge sample">${esc(a.meta.source)}</span></div>
+    ${window.freshBar ? window.freshBar(fr) : ''}
     ${summary}${callout}${toggle}
   </div>`;
 }
@@ -184,7 +186,7 @@ const trendCls = l => l === 'rising' ? 't-rising' : l === 'declining' ? 't-decli
   : l === 'stable' ? 't-stable' : 't-muted';
 const pct = x => x == null ? '—' : (x >= 0 ? '+' : '') + Math.round(x * 100) + '%';
 
-function trendsModule(t) {
+function trendsModule(t, fr) {
   if (!t || !t.available) {
     return `<div class="module">
       <div class="module-head"><h3>Google Trends — search interest</h3><span class="src-badge sample">no data yet</span></div>
@@ -193,6 +195,7 @@ function trendsModule(t) {
   }
   return `<div class="module">
     <div class="module-head"><h3>Google Trends — search interest</h3><span class="src-badge">${esc(t.source)} · to ${esc(t.latest_date)}</span></div>
+    ${window.freshBar ? window.freshBar(fr) : ''}
     <div class="trend-tabs" id="trendCountryTabs">
       ${t.countries.map(c => `<button class="tcountry ${c.code === t.default_country ? 'active' : ''}" data-c="${c.code}">${esc(c.name)}</button>`).join('')}
     </div>

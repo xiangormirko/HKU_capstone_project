@@ -29,7 +29,7 @@ function renderFusion(d) {
   // headline
   let html = '';
   if (d.headline) {
-    html += `<div class="fusion-headline"><span class="hl-ico"></span><div>${esc(d.headline)}</div></div>`;
+    html += `<div class="fusion-headline"><span class="hl-ico"></span><div>${d.headline}</div></div>`;
   }
 
   // two columns: source | sell
@@ -73,13 +73,44 @@ function renderFusion(d) {
 
   // category source→sell routes
   html += `<div class="section-title" style="margin-top:26px"><div class="dot" style="background:var(--accent)"></div> Source → Sell routes by category</div>`;
-  html += (d.category_opportunities || []).map(c => `
+  html += `<div style="font-size:11px;color:var(--text2);margin:-4px 0 12px;line-height:1.5">Each route fuses up to five signals — Reddit demand, Amazon review pain points, Google Trends momentum, UN Comtrade trade and Statista skin-type sizing.</div>`;
+  html += (d.category_opportunities || []).map(c => {
+    const sellChips = (c.sell_to || []).map(s => {
+      if (s.momentum_3m != null) {
+        const up = s.momentum_3m >= 0;
+        return `<span class="chip-sm">${esc(s.country)} <span class="${up ? 'sent-pos' : 'sent-neg'}">${up ? '↑' : '↓'}${Math.abs(s.momentum_3m).toFixed(0)}</span></span>`;
+      }
+      return `<span class="chip-sm">${esc(s.country)} · ${sb(s.net_import_b)}</span>`;
+    }).join('') || '<span style="color:var(--text2);font-size:11px">—</span>';
+
+    // unmet need (Amazon review pain point) = the product gap to solve
+    let need = '';
+    if (c.unmet_need) {
+      const p = c.unmet_need;
+      need = `<div class="route-need">
+        <span class="need-ico">◎</span>
+        <div><span class="need-lbl">Product gap to solve</span>
+          <strong>${esc(p.name)}</strong> — ${p.neg_rate.toFixed(0)}% of Amazon reviews complain (${p.mentions.toLocaleString()} mentions)
+          ${c.complaint ? `<div class="need-quote">“${esc(c.complaint)}”${c.complaint_brand ? ` <span style="opacity:.7">— on ${esc(c.complaint_brand)}</span>` : ''}</div>` : ''}
+          ${c.best_in_class ? `<div class="need-bm">Benchmark to beat: <strong>${esc(c.best_in_class.brand)}</strong> (${c.best_in_class.avg_rating}★, ${c.best_in_class.total_ratings.toLocaleString()} ratings)</div>` : ''}
+        </div></div>`;
+    }
+
+    // meta chips: addressable segment + emerging formats + markets to avoid
+    const metaChips = [];
+    if (c.addressable_segment) metaChips.push(`<span class="chip-meta">Segment: ${esc(c.addressable_segment.skin_type)} skin ~${c.addressable_segment.pct}%</span>`);
+    (c.emerging_formats || []).slice(0, 2).forEach(f => metaChips.push(`<span class="chip-meta accent">Rising format: ${esc(f.format)}</span>`));
+    if (c.declining_markets && c.declining_markets.length) metaChips.push(`<span class="chip-meta warn">Avoid (declining): ${c.declining_markets.slice(0, 3).map(esc).join(', ')}</span>`);
+
+    return `
     <div class="route-card">
       <div class="route-head">
         <h4>${esc(c.category)}</h4>
         <span class="tag-angle ${ANGLE_CLS[c.angle] || 'differentiate'}">${esc(c.angle)}</span>
+        ${c.n_signals ? `<span class="chip-meta">${c.n_signals} signals aligned</span>` : ''}
         <span style="font-size:11px;color:var(--text2)">${c.n_posts} conversations · <span class="${sentClass(c.sentiment_label)}">${c.sentiment_label}</span></span>
       </div>
+      ${need}
       <div class="route-flow">
         <div class="route-box">
           <div class="rb-label">Source from</div>
@@ -87,11 +118,27 @@ function renderFusion(d) {
         </div>
         <div class="route-arrow">→</div>
         <div class="route-box">
-          <div class="rb-label">Sell to</div>
-          ${c.sell_to.map(s => `<span class="chip-sm">${esc(s.country)} · ${sb(s.net_import_b)}</span>`).join('')}
+          <div class="rb-label">Sell to <span style="font-weight:400;opacity:.7">· ${esc(c.sell_basis || '')}</span></div>
+          ${sellChips}
         </div>
       </div>
-    </div>`).join('');
+      ${metaChips.length ? `<div class="route-meta">${metaChips.join('')}</div>` : ''}
+    </div>`;
+  }).join('');
+
+  // emerging formats — cross-market new-product whitespace
+  const ef = d.emerging_formats || [];
+  if (ef.length) {
+    html += `<div class="section-title" style="margin-top:26px"><div class="dot" style="background:var(--accent)"></div> Emerging formats — new-product whitespace</div>`;
+    html += `<div style="font-size:11px;color:var(--text2);margin:-4px 0 12px;line-height:1.5">Sub-categories whose search interest is rising across multiple markets at once — the literal new-product backlog, ranked by breadth and momentum.</div>`;
+    html += `<div class="ef-grid">` + ef.map(f => `
+      <div class="ef-card">
+        <div class="ef-top"><strong>${esc(f.format)}</strong><span class="chip-meta accent">↑${f.avg_momentum.toFixed(0)}</span></div>
+        <div class="ef-sub">${esc(f.category)}</div>
+        <div class="ef-markets">Rising in ${f.n_markets} market${f.n_markets === 1 ? '' : 's'}: ${f.markets_rising.slice(0, 4).map(esc).join(', ')}${f.markets_rising.length > 4 ? '…' : ''}</div>
+        ${f.pain_point ? `<div class="ef-need">Pairs with gap: ${esc(f.pain_point.name)} (${f.pain_point.neg_rate.toFixed(0)}% neg)</div>` : ''}
+      </div>`).join('') + `</div>`;
+  }
 
   // provenance note
   if (d.meta && d.meta.note) {
