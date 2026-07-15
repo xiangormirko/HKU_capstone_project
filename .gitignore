@@ -6,3 +6,4 @@ scheduler/.env
 .vscode/
 **/__pycache__/
 *.pyc
+*.dump
