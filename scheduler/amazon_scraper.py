@@ -1,6 +1,6 @@
-# amazon_scraper.py
+# scheduler/amazon_scraper.py
 import logging
-from datetime import datetime, timezone
+import json
 import psycopg2
 from psycopg2.extras import execute_values
 from apify_client import ApifyClient
@@ -20,56 +20,93 @@ class AmazonApifyScraper:
     def _get_db_connection(self):
         return psycopg2.connect(**self.db_config)
 
-    def scrape_reviews(self, actor_id: str, run_input: dict):
-        """Triggers the remote Apify Actor, downloads dataset results, and updates PostgreSQL."""
+    def scrape_reviews(self, actor_id: str, run_input: dict, product_category_map: dict = None):
+        """
+        Triggers the remote Apify Actor, downloads dataset results, 
+        maps categories dynamically, and performs a bulk PostgreSQL UPSERT.
+        """
         logger.info(f"Launching remote Apify Amazon Review Actor: {actor_id}...")
-        
+
+        # FALLBACK: If scheduler doesn't pass a map, use this default skincare mapping
+        if product_category_map is None:
+            product_category_map = {
+                "B0BVV8BNYJ": "Cleanser & Oil Control",    # Anua Heartleaf Cleansing Foam
+                "B0BN2PX8V3": "Cleanser & Oil Control",    # Anua Heartleaf Cleansing Oil
+                "B07RJ18VMF": "Moisturizer & Hydration",   # COSRX Snail Mucin Essence
+                "B08CQ9T6KN": "Sunscreen / SPF",           # Beauty of Joseon Sunscreen
+                "B09Y4HHY1P": "Sunscreen / SPF"            # Round Lab Sunscreen
+            }
+
         try:
+            # 1. Call the remote Apify Actor
             run = self.client.actor(actor_id).call(run_input=run_input)
             dataset_id = run.get("defaultDatasetId")
-            logger.info(f"Actor execution completed successfully. Fetching items from Dataset: {dataset_id}")
-            
+            logger.info(f"Actor execution completed successfully. Fetching items from Dataset ID: {dataset_id}")
+
+            # 2. Extract scraped reviews
             dataset_items = self.client.dataset(dataset_id).list_items().items
-            logger.info(f"Downloaded {len(dataset_items)} review records from cloud store.")
-            
-            reviews_payload = []
-            fallback_asin = run_input.get("products", ["Unknown"])[0]
+            logger.info(f"Successfully downloaded {len(dataset_items)} reviews from Apify.")
 
+            if not dataset_items:
+                logger.warning("No reviews returned in dataset.")
+                return True
+
+            # 3. Parse records and structure database row values
+            insert_rows = []
             for item in dataset_items:
-                review_id = item.get("reviewId") or item.get("id")
-                if not review_id:
-                    continue
+                asin = item.get("productAsin")
                 
-                reviews_payload.append((
-                    str(review_id),
-                    str(item.get("asin", fallback_asin)),
-                    item.get("title", ""),
+                # Resolve the skincare category using the mapping
+                category = product_category_map.get(asin, "General Skincare")
+                
+                # Serialize the nested aspects array into a raw JSON string for PostgreSQL JSONB
+                aspects_json = json.dumps(item.get("aspects", []))
+                
+                row = (
+                    item.get("reviewId"),
+                    asin,
+                    category,
                     item.get("rating"),
-                    item.get("reviewText") or item.get("text", ""),
-                    bool(item.get("isVerified", False)),
-                    int(item.get("helpfulCount", 0)),
-                    datetime.now(timezone.utc).isoformat()
-                ))
+                    bool(item.get("verifiedPurchase", False)),
+                    item.get("reviewTitle"),
+                    item.get("reviewDate"),
+                    item.get("reviewText"),
+                    item.get("helpfulVoteCount", 0),
+                    aspects_json,
+                    item.get("productTitle"),
+                    item.get("productUrl")
+                )
+                insert_rows.append(row)
 
-            if not reviews_payload:
-                logger.warning("No valid reviews extracted from payload.")
-                return
+            # 4. Define the SQL statement utilizing ON CONFLICT (UPSERT)
+            upsert_query = """
+                INSERT INTO amazon_reviews (
+                    review_id, asin, category, rating, verified_purchase, 
+                    review_title, review_date, review_text, helpful_vote_count, 
+                    aspects, product_title, product_url
+                ) VALUES %s
+                ON CONFLICT (review_id) DO UPDATE SET
+                    rating = EXCLUDED.rating,
+                    verified_purchase = EXCLUDED.verified_purchase,
+                    review_title = EXCLUDED.review_title,
+                    review_date = EXCLUDED.review_date,
+                    review_text = EXCLUDED.review_text,
+                    helpful_vote_count = EXCLUDED.helpful_vote_count,
+                    aspects = EXCLUDED.aspects,
+                    product_title = EXCLUDED.product_title,
+                    product_url = EXCLUDED.product_url,
+                    scraped_at = CURRENT_TIMESTAMP;
+            """
 
-            conn = self._get_db_connection()
-            with conn.cursor() as cur:
-                query = """
-                    INSERT INTO amazon_reviews_data (review_id, asin, title, rating, review_text, is_verified, helpful_count, scraped_at)
-                    VALUES %s
-                    ON CONFLICT (review_id) 
-                    DO UPDATE SET helpful_count = EXCLUDED.helpful_count;
-                """
-                execute_values(cur, query, reviews_payload)
-                conn.commit()
-                logger.info(f"Successfully synchronized {len(reviews_payload)} Amazon reviews to PostgreSQL.")
-            conn.close()
-
-            return len(reviews_payload)
+            # 5. Execute using your existing connection manager
+            with self._get_db_connection() as conn:
+                with conn.cursor() as cur:
+                    execute_values(cur, upsert_query, insert_rows)
+                    conn.commit()
+            
+            logger.info(f"Successfully upserted {len(insert_rows)} reviews into the database.")
+            return True
 
         except Exception as e:
-            logger.error(f"Critical error occurred inside Apify execution pipeline: {e}")
-            return 0
+            logger.error(f"Error executing Amazon scraper pipeline: {e}", exc_info=True)
+            return False

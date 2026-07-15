@@ -1,22 +1,36 @@
 """
 Social discovery query layer for Product Scout.
 
-Loads the processed Reddit data (from social_ingest.py) and answers
+Loads the processed Reddit data from PostgreSQL and answers
 e-commerce-style queries like "oily skin remover" — resolving them to product
 categories / brands / ingredients, then returning the most relevant posts with
 sentiment scoring and the products mentioned in them.
-
-Source-agnostic: posts carry a `source` field, so future platforms slot in.
 """
 
+import os
 import json
 import re
+import urllib.parse
 from collections import Counter, defaultdict
 from pathlib import Path
+from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
 
 from social_ingest import build_matchers, extract
 
-DATA_DIR = Path(__file__).parent / "data"
+# -------------------------------------------------------------------------
+# DATABASE CONNECTION SETUP (Safely handles special characters)
+# -------------------------------------------------------------------------
+load_dotenv()
+
+db_user = os.getenv("DB_USER", "postgres")
+db_password = urllib.parse.quote_plus(os.getenv("DB_PASSWORD", ""))
+db_host = os.getenv("DB_HOST", "localhost")
+db_port = os.getenv("DB_PORT", "5432")
+db_name = os.getenv("DB_NAME", "capstone_db")
+
+DATABASE_URL = os.getenv("DATABASE_URL") or f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+engine = create_engine(DATABASE_URL)
 
 STOPWORDS = {
     "the", "a", "an", "to", "for", "of", "and", "or", "my", "me", "i", "is", "in",
@@ -43,14 +57,72 @@ def _label(v):
 
 class SocialData:
     def __init__(self):
-        self.posts = json.loads((DATA_DIR / "social_posts.json").read_text())
-        self.entities = json.loads((DATA_DIR / "social_entities.json").read_text())
-        self.categories = json.loads((DATA_DIR / "social_categories.json").read_text())
-        self.meta = json.loads((DATA_DIR / "social_meta.json").read_text())
+        """
+        DATABASE MIGRATION: Replaced original flat JSON file loads with direct PostgreSQL queries.
+        Casts database numeric types to primitive floats/ints to avoid Decimal type collisions downstream.
+        """
+        print("📥 Initializing SocialData: Fetching analytical layers from PostgreSQL...")
+
+        with engine.connect() as conn:
+            # 1. Load posts from social_posts table
+            post_rows = conn.execute(text("SELECT * FROM social_posts")).mappings().all()
+            self.posts = []
+            for r in post_rows:
+                p = dict(r)
+                if isinstance(p.get("categories"), str): p["categories"] = json.loads(p["categories"])
+                if isinstance(p.get("brands"), str): p["brands"] = json.loads(p["brands"])
+                if isinstance(p.get("ingredients"), str): p["ingredients"] = json.loads(p["ingredients"])
+                if isinstance(p.get("entities"), str): p["entities"] = json.loads(p["entities"])
+                if isinstance(p.get("top_comments"), str): p["top_comments"] = json.loads(p["top_comments"])
+                
+                # Safe Type Casting
+                p["post_sentiment"] = float(p["post_sentiment"]) if p["post_sentiment"] is not None else 0.0
+                p["discussion_sentiment"] = float(p["discussion_sentiment"]) if p["discussion_sentiment"] is not None else 0.0
+                p["n_comments"] = int(p["n_comments"]) if p["n_comments"] is not None else 0
+                self.posts.append(p)
+
+            # 2. Load global entities rollup summary
+            entity_rows = conn.execute(text("SELECT * FROM social_entities")).mappings().all()
+            self.entities = []
+            for r in entity_rows:
+                e = dict(r)
+                e["mentions"] = int(e["mentions"]) if e["mentions"] is not None else 0
+                e["n_posts"] = int(e["n_posts"]) if e["n_posts"] is not None else 0
+                e["avg_sentiment"] = float(e["avg_sentiment"]) if e["avg_sentiment"] is not None else 0.0
+                self.entities.append(e)
+
+            # 3. Load global categories rollup summary
+            cat_rows = conn.execute(text("SELECT * FROM social_categories")).mappings().all()
+            self.categories = []
+            for r in cat_rows:
+                c = dict(r)
+                if isinstance(c.get("top_products"), str): c["top_products"] = json.loads(c["top_products"])
+                if isinstance(c.get("top_ingredients"), str): c["top_ingredients"] = json.loads(c["top_ingredients"])
+                
+                c["n_posts"] = int(c["n_posts"]) if c["n_posts"] is not None else 0
+                c["avg_sentiment"] = float(c["avg_sentiment"]) if c["avg_sentiment"] is not None else 0.0
+                self.categories.append(c)
+
+            # 4. Load metadata snapshot
+            meta_row = conn.execute(text("SELECT * FROM social_meta LIMIT 1")).mappings().first()
+            if meta_row:
+                m = dict(meta_row)
+                if isinstance(m.get("sources"), str): m["sources"] = json.loads(m["sources"])
+                if isinstance(m.get("subreddits"), str): m["subreddits"] = json.loads(m["subreddits"])
+                
+                m["n_posts"] = int(m["n_posts"]) if m["n_posts"] is not None else 0
+                m["n_comments"] = int(m["n_comments"]) if m["n_comments"] is not None else 0
+                m["avg_post_sentiment"] = float(m["avg_post_sentiment"]) if m["avg_post_sentiment"] is not None else 0.0
+                self.meta = m
+            else:
+                self.meta = {"sources": ["reddit"], "subreddits": [], "n_posts": 0, "n_comments": 0}
+
+        # PERFECT MATCH: Retaining original underscore naming contracts used by downstream methods
         self.matchers = build_matchers()
         self._by_id = {p["id"]: p for p in self.posts}
-        # entity sentiment lookup
         self._ent_sent = {(e["entity_type"], e["entity"]): e for e in self.entities}
+
+        print(f"✅ Successfully cached {len(self.posts)} processed posts from database into memory.")
 
     # ---------- overview for the discovery landing ----------
     def overview(self):
@@ -271,7 +343,6 @@ class SocialData:
             "top_comment": top_comment,
             "relevance": round(score, 1),
         }
-
 
     # ---------- category page bundle (Amazon + Trends + Reddit) ----------
     def category_page(self, name):

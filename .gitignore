@@ -2,3 +2,7 @@ scheduler/.env
 
 # local preview venv
 .venv/
+.env
+.vscode/
+**/__pycache__/
+*.pyc

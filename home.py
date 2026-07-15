@@ -47,8 +47,9 @@ def _blue_ocean(n=5):
                 f"market{'' if f['n_markets'] == 1 else 's'}"
                 + (f" ({shown})" if shown else "")
                 + f" · {_short(f['category'])}")
-        if f.get("pain_point"):
-            meta += f". Pairs with an unsolved gap: {f['pain_point']['name']}."
+        pain_point = f.get("pain_point")
+        if isinstance(pain_point, dict) and pain_point.get("name"):
+            meta += f". Pairs with an unsolved gap: {pain_point['name']}."
         out.append({
             "title": f["format"],
             "meta": meta,

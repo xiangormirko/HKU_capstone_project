@@ -9,6 +9,9 @@ ranking, and the shared trade/monthly recency logic.
 Run:  .venv/bin/python -m pytest -q
 """
 
+import os
+import sys
+
 import analytics
 import home
 import fusion
@@ -17,6 +20,14 @@ from amazon import get_amazon
 
 
 # ─────────────────────────── analytics / trade ───────────────────────────
+def test_server_loads_project_dotenv_file(monkeypatch):
+    for name in ["DB_NAME", "DB_USER", "DB_PASSWORD", "DB_HOST", "DB_PORT", "ANTHROPIC_API_KEY", "PORT", "MODEL"]:
+        monkeypatch.delenv(name, raising=False)
+    sys.modules.pop("server", None)
+    import server  # noqa: F401
+    assert os.environ.get("DB_NAME") == "capstone_db"
+
+
 def test_latest_complete_not_after_latest():
     td = analytics.TradeData()
     assert td.latest_complete in td.years

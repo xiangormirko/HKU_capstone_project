@@ -16,6 +16,7 @@ import os
 import json
 from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
+from dotenv import load_dotenv
 
 from analytics import get_data
 from social import get_social
@@ -26,7 +27,8 @@ import skin_types
 import home as home_mod
 import refresh_manager
 
-HERE = Path(__file__).parent
+HERE = Path(__file__).resolve().parent
+load_dotenv(HERE / ".env")
 MODEL = os.environ.get("MODEL", "claude-sonnet-4-6")
 
 app = Flask(__name__)

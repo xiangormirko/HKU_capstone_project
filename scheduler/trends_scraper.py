@@ -50,19 +50,27 @@ class GoogleTrendsScraper:
                 
                 df_db = df_long[['date', 'country', 'category', 'type', 'query_id', 'keyword', 'score']]
                 
-                with self.engine.begin() as connection:
-                    for _, row in df_db.iterrows():
-                        insert_stmt = text("""
+                insert_stmt = text("""
                             INSERT INTO google_trends_data (date, country, category, type, query_id, keyword, score)
                             VALUES (:date, :country, :category, :type, :query_id, :keyword, :score)
-                            ON CONFLICT (date, country, keyword) 
+                            ON CONFLICT (date, country, keyword)
                             DO UPDATE SET score = EXCLUDED.score;
                         """)
-                        connection.execute(insert_stmt, {
-                            "date": row['date'], "country": row['country'], "category": row['category'],
-                            "type": row['type'], "query_id": row['query_id'], "keyword": row['keyword'], "score": row['score']
-                        })
+
+                # 2. Defensive cleansing: Convert datetimes to strings to eliminate driver friction
+                df_db_clean = df_db.copy()
+                if pd.api.types.is_datetime64_any_dtype(df_db_clean['date']):
+                    df_db_clean['date'] = df_db_clean['date'].dt.strftime('%Y-%m-%d')
                 
+                # Safe type-casting: Map Pandas NaN elements to native Python None (SQL NULL values)
+                records = df_db_clean.where(pd.notnull(df_db_clean), None).to_dict(orient='records')
+
+                # 3. Open a transactional block and dispatch the entire array in 1 network trip
+                if records:
+                    with self.engine.begin() as connection:
+                        # Passing a list of dictionaries automatically triggers SQLAlchemy batch execution
+                        connection.execute(insert_stmt, records)
+                        
                 logger.info(f"Successfully committed trends data for {country} - {query_id} into DB.")
                 return
                 

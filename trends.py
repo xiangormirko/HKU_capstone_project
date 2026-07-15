@@ -1,26 +1,14 @@
-"""
-Google Trends intelligence for Product Scout category pages.
-
-Reads two real Google Trends exports:
-  metrics.csv     — per keyword/brand/subcategory momentum metrics
-                    (avg/peak score, 3m & 6m momentum, YoY growth, trend label)
-  timeseries.csv  — weekly relative search interest (0-100) per keyword,
-                    per country, 2023-12 -> 2025-12.
-
-Covers 3 categories (cleanser/oil-control, moisturizer/hydration, sunscreen/SPF)
-in 2 markets (HK, JP). Provides:
-  * category_block(name) — everything the Google Trends UI module needs
-  * agent_summary(name)  — a compact view for the Claude agent
-"""
-
-import shutil
+import os
+import urllib.parse
 from pathlib import Path
-
 import pandas as pd
+from sqlalchemy import create_engine, text
+from dotenv import load_dotenv
+
+# Load environment variables for database connectivity
+load_dotenv()
 
 HERE = Path(__file__).parent
-TRENDS_DIR = HERE / "data" / "trends"
-DOWNLOADS = Path.home() / "Downloads"
 
 # social category name -> trends category key
 CATEGORY_KEYS = {
@@ -28,16 +16,17 @@ CATEGORY_KEYS = {
     "Moisturizer & Hydration": "moisturizer_hydration",
     "Sunscreen / SPF": "sunscreen_spf",
 }
+
 COUNTRY_NAMES = {
-    "US": "United States", "GB": "United Kingdom", "AU": "Australia", "DE": "Germany",
-    "FR": "France", "JP": "Japan", "KR": "South Korea", "SG": "Singapore",
-    "HK": "Hong Kong", "TW": "Taiwan", "TH": "Thailand", "MY": "Malaysia", "PH": "Philippines",
+    "US": "United States", "GB": "United Kingdom", "AU": "Australia",
+    "DE": "Germany", "FR": "France", "JP": "Japan", "KR": "South Korea",
+    "SG": "Singapore", "HK": "Hong Kong", "TW": "Taiwan", "TH": "Thailand",
+    "MY": "Malaysia", "PH": "Philippines",
 }
+
 BRANDS_KEY = "brands"
 DEFAULT_COUNTRY = "US"
-# preferred display order for the country tabs
 COUNTRY_ORDER = ["US", "GB", "AU", "DE", "FR", "JP", "KR", "SG", "HK", "TW", "TH", "MY", "PH"]
-
 
 def _num(v):
     return None if v is None or pd.isna(v) else round(float(v), 3)
@@ -45,16 +34,86 @@ def _num(v):
 
 class TrendsData:
     def __init__(self):
-        self._ensure()
-        self.metrics = pd.read_csv(TRENDS_DIR / "metrics.csv")
-        self.ts = pd.read_csv(TRENDS_DIR / "timeseries.csv")
+        """
+        Initializes the intelligence engine by fetching raw time-series data from PostgreSQL
+        and computing analytical metrics in-memory upon startup (Acting as a Warmed Cache).
+        """
+        # 1. Establish database connection engine securely
+        db_user = os.getenv("DB_USER", "postgres")
+        db_password = urllib.parse.quote_plus(os.getenv("DB_PASSWORD", ""))
+        db_host = os.getenv("DB_HOST", "localhost")
+        db_port = os.getenv("DB_PORT", "5432")
+        db_name = os.getenv("DB_NAME", "capstone_db")
+        db_url = f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+        engine = create_engine(db_url)
 
-    def _ensure(self):
-        TRENDS_DIR.mkdir(parents=True, exist_ok=True)
-        for f in ["metrics.csv", "timeseries.csv"]:
-            dest = TRENDS_DIR / f
-            if not dest.exists() and (DOWNLOADS / f).exists():
-                shutil.copy(DOWNLOADS / f, dest)
+        # 2. Fetch raw time-series directly from PostgreSQL
+        query = "SELECT date, country, category, type, query_id, keyword, score FROM google_trends_data;"
+        df_raw = pd.read_sql(query, engine)
+        
+        if df_raw.empty:
+            self.ts = pd.DataFrame()
+            self.metrics = pd.DataFrame()
+            return
+
+        # 3. Standardize types and cache the raw timeseries formatted for the frontend
+        df_raw['date'] = pd.to_datetime(df_raw['date'])
+        self.ts = df_raw.copy()
+        # Format date back to string to preserve original UI/frontend expectations
+        self.ts['date'] = self.ts['date'].dt.strftime('%Y-%m-%d')
+
+        # 4. Compute analytical metrics (Momentum, YoY Growth, Labels) on the fly
+        rows = []
+        for (country, query_id, category, qtype, keyword), grp in df_raw.groupby(
+            ['country', 'query_id', 'category', 'type', 'keyword']
+        ):
+            s = grp.sort_values('date')['score'].astype(float)
+            if s.notna().sum() < 4:
+                continue
+
+            # 3-month momentum (recent 13w vs prior 13w)
+            last_13 = s.tail(13)
+            prev_13 = s.iloc[-26:-13] if len(s) >= 26 else s.iloc[:13]
+            recent_mean_13 = last_13.mean()
+            prior_mean_13  = prev_13.mean()
+            momentum_3m = ((recent_mean_13 / prior_mean_13) - 1) if prior_mean_13 > 0 else 0.0
+
+            # 6-month momentum (recent 26w vs prior 26w)
+            last_26 = s.tail(26)
+            prev_26 = s.iloc[-52:-26] if len(s) >= 52 else s.iloc[:26]
+            recent_mean_26 = last_26.mean()
+            prior_mean_26  = prev_26.mean()
+            momentum_6m = ((recent_mean_26 / prior_mean_26) - 1) if prior_mean_26 > 0 else 0.0
+
+            # Year-over-year growth (recent 52w vs prior 52w)
+            last_52  = s.tail(52)
+            prev_52  = s.iloc[-104:-52] if len(s) >= 104 else pd.Series(dtype=float)
+            growth_yoy = ((last_52.mean() / prev_52.mean()) - 1) if len(prev_52) > 0 and prev_52.mean() > 0 else 0.0
+
+            # Assign trend labels based on 3-month momentum thresholds
+            if momentum_3m > 0.20:
+                trend_label = 'rising'
+            elif momentum_3m < -0.20:
+                trend_label = 'declining'
+            else:
+                trend_label = 'stable'
+
+            rows.append({
+                'country':      country,
+                'query_id':     query_id,
+                'category':     category,
+                'type':         qtype,
+                'keyword':      keyword,
+                'avg_score':    round(s.mean(), 2),
+                'peak_score':   round(s.max(), 2),
+                'momentum_3m':  round(momentum_3m, 3),
+                'momentum_6m':  round(momentum_6m, 3),
+                'growth_yoy':   round(growth_yoy, 3),
+                'trend_label':  trend_label,
+                'latest_date':  grp['date'].max().strftime('%Y-%m-%d'),
+            })
+
+        self.metrics = pd.DataFrame(rows)
 
     def has(self, name):
         return name in CATEGORY_KEYS

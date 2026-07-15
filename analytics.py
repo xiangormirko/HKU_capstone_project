@@ -1,18 +1,31 @@
 """
 Analytics layer over the real UN Comtrade HS 3304 data.
 
-Loads the CSVs produced by fetch_data.py and provides:
-  * build_payload()  -> everything the dashboard frontend needs (one JSON)
-  * a set of query_* functions the Claude agent calls as tools
-
-All numbers come from official customs data — nothing is mocked.
+Loads the trade data tables from PostgreSQL instead of flat CSV files
+and provides data mapping pipelines for frontend visualization.
 """
 
+import os
+import urllib.parse
 from pathlib import Path
 import pandas as pd
 import pycountry
+from sqlalchemy import create_engine
+from dotenv import load_dotenv
 
-DATA_DIR = Path(__file__).parent / "data"
+# -------------------------------------------------------------------------
+# DATABASE CONNECTION SETUP
+# -------------------------------------------------------------------------
+load_dotenv()
+
+db_user = os.getenv("DB_USER", "postgres")
+db_password = urllib.parse.quote_plus(os.getenv("DB_PASSWORD", ""))
+db_host = os.getenv("DB_HOST", "localhost")
+db_port = os.getenv("DB_PORT", "5432")
+db_name = os.getenv("DB_NAME", "capstone_db")
+
+DATABASE_URL = os.getenv("DATABASE_URL") or f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+engine = create_engine(DATABASE_URL)
 
 _FLAG_CACHE = {}
 
@@ -29,33 +42,46 @@ def flag_for(iso3):
     _FLAG_CACHE[iso3] = f
     return f
 
+
 # Common name aliases so the agent can resolve casual user phrasing.
 ALIASES = {
     "south korea": "Rep. of Korea", "korea": "Rep. of Korea", "s korea": "Rep. of Korea",
     "uk": "United Kingdom", "britain": "United Kingdom", "great britain": "United Kingdom",
     "usa": "USA", "us": "USA", "united states": "USA", "america": "USA",
     "uae": "United Arab Emirates", "emirates": "United Arab Emirates",
-    "hong kong": "China, Hong Kong SAR", "turkey": "Türkiye",
-    "vietnam": "Viet Nam", "russia": "Russian Federation", "czech republic": "Czechia",
 }
 
 
 class TradeData:
     def __init__(self):
-        self.exports = pd.read_csv(DATA_DIR / "world_exports.csv")
-        self.imports = pd.read_csv(DATA_DIR / "world_imports.csv")
-        self.bilateral = pd.read_csv(DATA_DIR / "bilateral.csv")
+        """
+        DATABASE MIGRATION: Replaced original flat CSV file loads with direct PostgreSQL queries.
+        Loads records into identical Pandas DataFrames to preserve downstream calculations.
+        """
+        print("📥 Initializing TradeData: Fetching customs analytics from PostgreSQL...")
+
+        with engine.connect() as conn:
+            # 1. Load core annual trade datasets directly into DataFrames
+            self.exports = pd.read_sql("SELECT * FROM world_exports", con=conn)
+            self.imports = pd.read_sql("SELECT * FROM world_imports", con=conn)
+            self.bilateral = pd.read_sql("SELECT * FROM bilateral", con=conn)
+
+            # 2. Safely attempt to load monthly rolling trend data
+            try:
+                self.monthly = pd.read_sql("SELECT * FROM monthly_trade", con=conn)
+            except Exception as e:
+                print(f"⚠️ Monthly trade data table not found or empty: {e}")
+                self.monthly = None
+
+        print(f"✅ TradeData successfully cached {len(self.exports)} exports and {len(self.imports)} imports from database.")
+
+        # -------------------------------------------------------------------------
+        # DOWNSTREAM ANALYTICAL LOGIC
+        # -------------------------------------------------------------------------
         self.years = sorted(set(self.exports["year"]) | set(self.imports["year"]))
         self.latest = self.years[-1]
         self.first = self.years[0]
-        # The newest annual year is often only partially reported (few countries
-        # filed yet), which would understate global totals. latest_complete is the
-        # last year whose country coverage holds up — used as the default display
-        # year so headline KPIs aren't skewed by an in-progress year.
         self.latest_complete = self._latest_complete_year()
-        # optional rolling monthly totals (fresher than annual) — safe if absent
-        mpath = DATA_DIR / "monthly_trade.csv"
-        self.monthly = pd.read_csv(mpath) if mpath.exists() else None
 
     def _latest_complete_year(self):
         cov = self.exports.groupby("year")["iso3"].nunique().to_dict()

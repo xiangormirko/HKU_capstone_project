@@ -24,6 +24,8 @@ sentiment granularity. Brand origin makes the sourcing link category-specific.
 
 from collections import Counter, defaultdict
 
+from imageio import formats
+
 from social import get_social
 from analytics import get_data
 from amazon import get_amazon
@@ -349,6 +351,16 @@ class Fusion:
                      and c["sell_to"]), None)
         if best:
             pp = best["unmet_need"]
+            
+            if isinstance(pp, str):
+                pp = {"name": pp, "neg_rate": 0.0, "mentions": 0}
+            elif not isinstance(pp, dict):
+                pp = {"name": "Unknown", "neg_rate": 0.0, "mentions": 0}
+            
+            pp_name = pp.get("name", "Unknown")
+            pp_neg = pp.get("neg_rate", 0.0)
+            pp_mentions = pp.get("mentions", 0)
+
             src = best["source_from"][0]
             mkt = best["sell_to"][0]
             seg = best.get("addressable_segment")
@@ -356,8 +368,8 @@ class Fusion:
                        if seg else "")
             return (
                 f"Top opportunity: a {best['category']} product that fixes "
-                f"<strong>{pp['name']}</strong> — {pp['neg_rate']:.0f}% of Amazon reviews "
-                f"({pp['mentions']:,} mentions) complain about it{seg_txt}. "
+                f"<strong>{pp_name}</strong> — {pp_neg:.0f}% of Amazon reviews "
+                f"({pp_mentions:,} mentions) complain about it{seg_txt}. "
                 f"Source from {src['tagline']} ({src['origin']}); sell into "
                 f"{mkt['country']} where {best['sell_basis']}."
             )
@@ -379,12 +391,77 @@ class Fusion:
         origins = self.sourcing_origins()
         sell = self.sell_to_markets(n=8)
         cats = self.category_opportunities()
+        formats = self.emerging_formats()
+        
+        if cats:
+            for c in cats:
+                if "unmet_need" in c and c["unmet_need"]:
+                    if isinstance(c["unmet_need"], str):
+                        c["unmet_need"] = None
+                    else:
+                        name = c["unmet_need"].get("name") or "Unknown"
+                        neg_rate = float(c["unmet_need"].get("neg_rate") or 0.0)
+                        mentions = int(c["unmet_need"].get("mentions") or 0)
+                        
+                        if mentions == 0 or neg_rate == 0:
+                            c["unmet_need"] = None
+                        else:
+                            c["unmet_need"] = {
+                                "name": name,
+                                "neg_rate": neg_rate,
+                                "mentions": mentions
+                            }
+                
+                if "best_in_class" in c and c["best_in_class"]:
+                    if isinstance(c["best_in_class"], str):
+                        c["best_in_class"] = {
+                            "brand": c["best_in_class"], 
+                            "avg_rating": None, 
+                            "total_ratings": None
+                        }
+                    else:
+                        brand = c["best_in_class"].get("brand") or "Unknown"
+                        avg_rating = c["best_in_class"].get("avg_rating")
+                        total_ratings = c["best_in_class"].get("total_ratings")
+                        
+                        if avg_rating is None or total_ratings is None or int(total_ratings) == 0:
+                            c["best_in_class"] = {
+                                "brand": brand,
+                                "avg_rating": None,
+                                "total_ratings": None
+                            }
+                        else:
+                            c["best_in_class"] = {
+                                "brand": brand,
+                                "avg_rating": float(avg_rating),
+                                "total_ratings": int(total_ratings)
+                            }
+
+        if formats:
+            for f in formats:
+                if "pain_point" in f and f["pain_point"]:
+                    if isinstance(f["pain_point"], str):
+                        f["pain_point"] = None
+                    else:
+                        name = f["pain_point"].get("name") or "Unknown"
+                        neg_rate = float(f["pain_point"].get("neg_rate") or 0.0)
+                        mentions = int(f["pain_point"].get("mentions") or 0)
+                        
+                        if mentions == 0 or neg_rate == 0:
+                            f["pain_point"] = None
+                        else:
+                            f["pain_point"] = {
+                                "name": name,
+                                "neg_rate": neg_rate,
+                                "mentions": mentions
+                            }
+
         return {
             "headline": self._headline(origins, sell, cats),
             "sourcing_origins": origins,
             "sell_to_markets": sell,
             "category_opportunities": cats,
-            "emerging_formats": self.emerging_formats(),
+            "emerging_formats": formats,
             "meta": {
                 "trade_year": getattr(self.trade, "latest_complete", self.trade.latest),
                 "social_posts": self.social.meta.get("n_posts"),
@@ -394,7 +471,7 @@ class Fusion:
                 "note": "Trade = UN Comtrade HS 3304 (country-level, all beauty/make-up prep). "
                         "Social = Reddit brand/category mentions + sentiment. Amazon = review "
                         "aspect pain points. Trends = category search momentum by market. "
-                        "Linked via brand origin + category.",
+                        "Linked via brand origin + category."
             },
         }
 

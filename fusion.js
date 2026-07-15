@@ -92,7 +92,13 @@ function renderFusion(d) {
         <div><span class="need-lbl">Product gap to solve</span>
           <strong>${esc(p.name)}</strong> — ${p.neg_rate.toFixed(0)}% of Amazon reviews complain (${p.mentions.toLocaleString()} mentions)
           ${c.complaint ? `<div class="need-quote">“${esc(c.complaint)}”${c.complaint_brand ? ` <span style="opacity:.7">— on ${esc(c.complaint_brand)}</span>` : ''}</div>` : ''}
-          ${c.best_in_class ? `<div class="need-bm">Benchmark to beat: <strong>${esc(c.best_in_class.brand)}</strong> (${c.best_in_class.avg_rating}★, ${c.best_in_class.total_ratings.toLocaleString()} ratings)</div>` : ''}
+          ${c.best_in_class ? `
+            <div class="need-bm">
+              Benchmark to beat: <strong>${esc(c.best_in_class.brand || 'Unknown')}</strong> 
+              (${c.best_in_class.avg_rating || 0}★, 
+              (${(c.best_in_class.total_ratings ?? 0).toLocaleString()} ratings)
+            </div>
+          ` : ''}
         </div></div>`;
     }
 
@@ -136,7 +142,7 @@ function renderFusion(d) {
         <div class="ef-top"><strong>${esc(f.format)}</strong><span class="chip-meta accent">↑${f.avg_momentum.toFixed(0)}</span></div>
         <div class="ef-sub">${esc(f.category)}</div>
         <div class="ef-markets">Rising in ${f.n_markets} market${f.n_markets === 1 ? '' : 's'}: ${f.markets_rising.slice(0, 4).map(esc).join(', ')}${f.markets_rising.length > 4 ? '…' : ''}</div>
-        ${f.pain_point ? `<div class="ef-need">Pairs with gap: ${esc(f.pain_point.name)} (${f.pain_point.neg_rate.toFixed(0)}% neg)</div>` : ''}
+        ${f.pain_point ? `<div class="ef-need">Pairs with gap: ${esc(f.pain_point.name || 'Unknown')} (${(f.pain_point.neg_rate ?? 0).toFixed(0)}% neg)</div>` : ''}
       </div>`).join('') + `</div>`;
   }
 
