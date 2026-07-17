@@ -1,9 +1,25 @@
-scheduler/.env
-
-# local preview venv
-.venv/
-.env
-.vscode/
+# Python
 **/__pycache__/
 *.pyc
+.pytest_cache/
+
+# Environments / secrets
+.venv/
+.env
+scheduler/.env
+
+# Editor / OS
+.vscode/
+.DS_Store
+
+# Data dumps
 *.dump
+
+# Local data: scraped content is PII and legacy flat files are loaded into
+# PostgreSQL, so they are not committed. Only the curated Statista input is kept.
+/data/*
+!/data/skin_types.json
+
+# Report figures / ad-hoc screenshots (belong with the report, not the code repo)
+report_assets/
+screenshots/
