@@ -3,10 +3,10 @@ Ingest real global cosmetics trade data (HS 3304 — beauty / make-up preparatio
 from the free, legal UN Comtrade public API and write directly into PostgreSQL.
 
 Tables written:
-1. world_exports  — each country's TOTAL exports to the World, per year
-2. world_imports  — each country's TOTAL imports from the World, per year
-3. bilateral      — exporter -> importer flows (for corridors & matrix)
-4. monthly_trade  — rolling monthly totals (for recent trend analysis)
+1. world_exports — each country's TOTAL exports to the World, per year
+2. world_imports — each country's TOTAL imports from the World, per year
+3. bilateral — exporter -> importer flows (for corridors & matrix)
+4. monthly_trade — rolling monthly totals (for recent trend analysis)
 
 Each row is enriched with ISO alpha-3, ISO numeric, and a world region.
 """
@@ -196,9 +196,9 @@ def fetch_world_totals(flow, years):
         try:
             data = get(params)
         except Exception as e:
-            print(f"  {year}: FAILED ({e})")
+            print(f" {year}: FAILED ({e})")
             continue
-        print(f"  {year}: {len(data)} countries")
+        print(f" {year}: {len(data)} countries")
         if data:
             frames.append(pd.DataFrame(data))
         time.sleep(0.4)
@@ -232,7 +232,7 @@ def fetch_bilateral(years):
                 frames.append(pd.DataFrame(data))
                 got += len(data)
             time.sleep(0.35)
-        print(f"  {name:<22} {got} rows")
+        print(f" {name:<22} {got} rows")
     valid_frames = [f for f in frames if not f.empty]
     return pd.concat(valid_frames, ignore_index=True) if valid_frames else pd.DataFrame()
 
@@ -256,10 +256,10 @@ def fetch_monthly(flow):
         try:
             data = get(params, url=MONTHLY_URL)
         except Exception as e:
-            print(f"  {period}: FAILED ({e})")
+            print(f" {period}: FAILED ({e})")
             continue
         if data:
-            print(f"  {period}: {len(data)} countries")
+            print(f" {period}: {len(data)} countries")
             frames.append(pd.DataFrame(data))
         time.sleep(0.5)
     valid_frames = [f for f in frames if not f.empty]
@@ -316,29 +316,29 @@ def main(full_history=False):
     print("Loading reference tables ...")
     lookup = load_country_lookup()
 
-    print("\n🔗 Connecting to PostgreSQL database...")
+    print("\nConnecting to PostgreSQL database...")
     with engine.begin() as conn:
 
         # 1. WORLD-TOTAL EXPORTS
         print("\nFetching WORLD-TOTAL EXPORTS (flow X) ...")
         exp = tidy_totals(fetch_world_totals("X", target_years), lookup, "country")
         if not exp.empty:
-            print(f"  -> Refreshing years {target_years} in 'world_exports'...")
+            print(f" -> Refreshing years {target_years} in 'world_exports'...")
             # Targeted deletion to prevent wiping out older historical constants
             conn.execute(text(f"DELETE FROM world_exports WHERE year IN ({','.join(map(str, target_years))})"))
             exp.to_sql("world_exports", con=conn, if_exists="append", index=False)
         else:
-            print("  ⚠️ Warning: No export data returned.")
+            print(" Warning: No export data returned.")
 
         # 2. WORLD-TOTAL IMPORTS
         print("\nFetching WORLD-TOTAL IMPORTS (flow M) ...")
         imp = tidy_totals(fetch_world_totals("M", target_years), lookup, "country")
         if not imp.empty:
-            print(f"  -> Refreshing years {target_years} in 'world_imports'...")
+            print(f" -> Refreshing years {target_years} in 'world_imports'...")
             conn.execute(text(f"DELETE FROM world_imports WHERE year IN ({','.join(map(str, target_years))})"))
             imp.to_sql("world_imports", con=conn, if_exists="append", index=False)
         else:
-            print("  ⚠️ Warning: No import data returned.")
+            print(" Warning: No import data returned.")
 
         # 3. BILATERAL EXPORT FLOWS
         print("\nFetching BILATERAL EXPORT FLOWS (major exporters) ...")
@@ -357,11 +357,11 @@ def main(full_history=False):
             bt = bt.dropna(subset=["trade_value_usd"])
             bt_final = bt.drop(columns=["importer_code"])
 
-            print(f"  -> Refreshing years {target_years} in 'bilateral'...")
+            print(f" -> Refreshing years {target_years} in 'bilateral'...")
             conn.execute(text(f"DELETE FROM bilateral WHERE year IN ({','.join(map(str, target_years))})"))
             bt_final.to_sql("bilateral", con=conn, if_exists="append", index=False)
         else:
-            print("  ⚠️ Warning: No bilateral data returned.")
+            print(" Warning: No bilateral data returned.")
 
         # 4. MONTHLY WORLD TOTALS (Always completely refreshed as it is a short rolling window)
         print("\nFetching MONTHLY WORLD TOTALS (rolling recency) ...")
@@ -371,13 +371,13 @@ def main(full_history=False):
 
         if not monthly.empty:
             monthly = monthly.drop(columns=["code"])
-            print("  -> Truncating and rewriting 'monthly_trade' table...")
+            print(" -> Truncating and rewriting 'monthly_trade' table...")
             conn.execute(text("TRUNCATE TABLE monthly_trade;"))
             monthly.to_sql("monthly_trade", con=conn, if_exists="append", index=False)
         else:
-            print("  -> No monthly data returned (skipped or failed)")
+            print(" -> No monthly data returned (skipped or failed)")
 
-    print("\n🎉 Database ingestion pipeline executed successfully!")
+    print("\nDatabase ingestion pipeline executed successfully!")
 
 
 if __name__ == "__main__":

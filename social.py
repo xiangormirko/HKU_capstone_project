@@ -61,7 +61,7 @@ class SocialData:
         DATABASE MIGRATION: Replaced original flat JSON file loads with direct PostgreSQL queries.
         Casts database numeric types to primitive floats/ints to avoid Decimal type collisions downstream.
         """
-        print("📥 Initializing SocialData: Fetching analytical layers from PostgreSQL...")
+        print("Initializing SocialData: Fetching analytical layers from PostgreSQL...")
 
         with engine.connect() as conn:
             # 1. Load posts from social_posts table
@@ -122,7 +122,7 @@ class SocialData:
         self._by_id = {p["id"]: p for p in self.posts}
         self._ent_sent = {(e["entity_type"], e["entity"]): e for e in self.entities}
 
-        print(f"✅ Successfully cached {len(self.posts)} processed posts from database into memory.")
+        print(f"Successfully cached {len(self.posts)} processed posts from database into memory.")
 
     # ---------- overview for the discovery landing ----------
     def overview(self):
@@ -159,7 +159,7 @@ class SocialData:
         for c in cats:
             s = c["avg_sentiment"] or 0.0
             demand = c["n_posts"] / max_posts
-            unmet = max(0.0, 0.25 - s)            # bonus when satisfaction is low
+            unmet = max(0.0, 0.25 - s) # bonus when satisfaction is low
             scored.append((demand * (1 + unmet * 2.5), c))
         scored.sort(key=lambda x: x[0], reverse=True)
 
@@ -205,7 +205,7 @@ class SocialData:
         if not q:
             return {"query": q, "resolved": {}, "summary": {}, "results": []}
 
-        targets = extract(q, self.matchers)            # {etype: Counter}
+        targets = extract(q, self.matchers) # {etype: Counter}
         target_set = {(et, name) for et, c in targets.items() for name in c}
         tokens = [t for t in re.findall(r"[a-z0-9]+", q.lower())
                   if t not in STOPWORDS and len(t) > 2]

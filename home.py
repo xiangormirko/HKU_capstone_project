@@ -105,7 +105,7 @@ def _trade_markets(n=5):
         return None
     return {
         "markets": [{
-            "title": f"{m['flag']} {m['country']}",
+            "title": f"{m['country']}",
             "meta": (f"Cosmetics imports grew {m['yoy_pct']:+.1f}% to ${m['value_b']:.2f}B "
                      f"(HS 3304) in {td.latest} — one of the fastest-rising destination markets."),
             "metric": f"{m['yoy_pct']:+.0f}%",

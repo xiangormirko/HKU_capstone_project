@@ -16,11 +16,11 @@ load_dotenv()
 
 # Configuration mapping
 POSTGRES_CONFIG = {
-    "dbname":   os.getenv("DB_NAME", "capstone_db"),
-    "user":     os.getenv("DB_USER", "postgres"),
+    "dbname": os.getenv("DB_NAME", "capstone_db"),
+    "user": os.getenv("DB_USER", "postgres"),
     "password": os.getenv("DB_PASSWORD"),
-    "host":     os.getenv("DB_HOST", "localhost"),
-    "port":     int(os.getenv("DB_PORT", 5432))
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", 5432))
 }
 SQLALCHEMY_URL = f"postgresql://{POSTGRES_CONFIG['user']}:{POSTGRES_CONFIG['password']}@{POSTGRES_CONFIG['host']}:{POSTGRES_CONFIG['port']}/{POSTGRES_CONFIG['dbname']}"
 APIFY_API_TOKEN = os.getenv("APIFY_API_TOKEN")
@@ -80,7 +80,7 @@ def test_amazon_apify_pipeline():
     pipeline_success = False
     
     for idx, actor_id in enumerate(actor_ids):
-        logger.info(f"➔ [Attempt {idx+1}/{len(actor_ids)}] Launching Actor ID: {actor_id}")
+        logger.info(f"[Attempt {idx+1}/{len(actor_ids)}] Launching Actor ID: {actor_id}")
         
         try:
             # Execute the original scraping and database ingestion logic
@@ -89,20 +89,20 @@ def test_amazon_apify_pipeline():
             
             # 3. Check if data was successfully fetched and ingested
             if records_count and records_count > 0:
-                logger.info(f"🟢 Success! Actor {actor_id} fetched and ingested {records_count} records.")
+                logger.info(f"Success! Actor {actor_id} fetched and ingested {records_count} records.")
                 pipeline_success = True
-                break  # Exit the loop early upon successful ingestion
+                break # Exit the loop early upon successful ingestion
             else:
-                logger.warning(f"⚠️ Warning: Actor {actor_id} returned 0 records (likely blocked by anti-bot system).")
+                logger.warning(f"Warning: Actor {actor_id} returned 0 records (likely blocked by anti-bot system).")
                 
         except Exception as e:
-            logger.error(f"❌ Error: Actor {actor_id} crashed during execution: {str(e)}")
+            logger.error(f"Error: Actor {actor_id} crashed during execution: {str(e)}")
             # Continue to the next fallback actor instead of breaking the pipeline
             continue
 
     # 4. Final pipeline status reporting
     if not pipeline_success:
-        logger.error("🚨 CRITICAL: All configured Actor IDs failed to bypass the Amazon firewall. Data pipeline halted.")
+        logger.error("CRITICAL: All configured Actor IDs failed to bypass the Amazon firewall. Data pipeline halted.")
     else:
         logger.info("=== Amazon Apify Scraper Integration Test Completed ===")
 

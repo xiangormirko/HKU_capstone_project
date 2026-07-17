@@ -11,15 +11,15 @@ def create_system_tables():
 
     # Extract connection parameters
     db_config = {
-        "dbname":   os.getenv("DB_NAME"),
-        "user":     os.getenv("DB_USER"),
+        "dbname": os.getenv("DB_NAME"),
+        "user": os.getenv("DB_USER"),
         "password": os.getenv("DB_PASSWORD"),
-        "host":     os.getenv("DB_HOST", "localhost"),
-        "port":     int(os.getenv("DB_PORT", "5432"))
+        "host": os.getenv("DB_HOST", "localhost"),
+        "port": int(os.getenv("DB_PORT", "5432"))
     }
 
     if not db_config["password"]:
-        print("❌ Error: DB_PASSWORD is missing in your .env file!")
+        print("Error: DB_PASSWORD is missing in your .env file!")
         return
 
     # Define the DDL statements for the raw ingest tables and the social analytics tables
@@ -212,10 +212,10 @@ def create_system_tables():
         cur.close()
         # Commit the changes
         conn.commit()
-        print("🚀 Success: All ingest and social analytics tables have been verified/created in PostgreSQL!")
+        print("Success: All ingest and social analytics tables have been verified/created in PostgreSQL!")
         
     except (Exception, psycopg2.DatabaseError) as error:
-        print(f"❌ Database Error: {error}")
+        print(f"Database Error: {error}")
     finally:
         if conn is not None:
             conn.close()

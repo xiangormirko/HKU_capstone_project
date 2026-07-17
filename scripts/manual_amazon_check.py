@@ -20,12 +20,12 @@ load_dotenv(dotenv_path=project_root / ".env")
 try:
     from main_scheduler import task_amazon_apify
     
-    print("🚀 Starting direct Amazon Scraper & DB integration test...")
+    print("Starting direct Amazon Scraper & DB integration test...")
     task_amazon_apify()
-    print("\n🎉 Test execution completed! Check your database to see the results.")
+    print("\nTest execution completed! Check your database to see the results.")
     
 except ImportError as ie:
-    print(f"❌ Import Error: Could not load scraper modules. Details: {ie}")
+    print(f"Import Error: Could not load scraper modules. Details: {ie}")
     print(f"Searched paths: {sys.path}")
 except Exception as e:
-    print(f"❌ Test failed during execution: {e}")
+    print(f"Test failed during execution: {e}")

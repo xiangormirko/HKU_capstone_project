@@ -31,16 +31,9 @@ _FLAG_CACHE = {}
 
 
 def flag_for(iso3):
-    """ISO3 -> flag emoji (regional indicator letters). Cached."""
-    if iso3 in _FLAG_CACHE:
-        return _FLAG_CACHE[iso3]
-    try:
-        a2 = pycountry.countries.get(alpha_3=iso3).alpha_2
-        f = "".join(chr(0x1F1E6 + ord(c) - 65) for c in a2)
-    except Exception:  # noqa: BLE001
-        f = "🏳️"
-    _FLAG_CACHE[iso3] = f
-    return f
+    """Country flags are intentionally disabled (no emoji in the UI); the field
+    is kept for API compatibility but always resolves to an empty string."""
+    return ""
 
 
 # Common name aliases so the agent can resolve casual user phrasing.
@@ -58,7 +51,7 @@ class TradeData:
         DATABASE MIGRATION: Replaced original flat CSV file loads with direct PostgreSQL queries.
         Loads records into identical Pandas DataFrames to preserve downstream calculations.
         """
-        print("📥 Initializing TradeData: Fetching customs analytics from PostgreSQL...")
+        print("Initializing TradeData: Fetching customs analytics from PostgreSQL...")
 
         with engine.connect() as conn:
             # 1. Load core annual trade datasets directly into DataFrames
@@ -70,10 +63,10 @@ class TradeData:
             try:
                 self.monthly = pd.read_sql("SELECT * FROM monthly_trade", con=conn)
             except Exception as e:
-                print(f"⚠️ Monthly trade data table not found or empty: {e}")
+                print(f"Monthly trade data table not found or empty: {e}")
                 self.monthly = None
 
-        print(f"✅ TradeData successfully cached {len(self.exports)} exports and {len(self.imports)} imports from database.")
+        print(f"TradeData successfully cached {len(self.exports)} exports and {len(self.imports)} imports from database.")
 
         # -------------------------------------------------------------------------
         # DOWNSTREAM ANALYTICAL LOGIC

@@ -38,11 +38,11 @@ def create_database_itself():
     try:
         print("Creating database 'capstone_db'...")
         cur.execute("CREATE DATABASE capstone_db;")
-        print("🚀 Success: 'capstone_db' has been created successfully!")
+        print("Success: 'capstone_db' has been created successfully!")
     except psycopg2.errors.DuplicateDatabase:
-        print("💡 Notice: 'capstone_db' already exists.")
+        print("Notice: 'capstone_db' already exists.")
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"Error: {e}")
     finally:
         # Resource cleanup: guarantee closure of cursor and connection objects
         cur.close()

@@ -9,9 +9,9 @@ const CHART_COLORS = ['#F97316','#FB923C','#0EA5E9','#EC4899','#F59E0B',
                       '#FB7185','#16A34A','#38BDF8','#94A3B8','#CBD5E1'];
 // esc(), stripHtml(), fmtB() are shared helpers from util.js (loaded first).
 
-let DATA = null;          // current payload
-let WORLD = null;         // topojson features (loaded once)
-let CHARTS = {};          // chart.js instances to destroy on re-render
+let DATA = null; // current payload
+let WORLD = null; // topojson features (loaded once)
+let CHARTS = {}; // chart.js instances to destroy on re-render
 
 // ───────────────────────── data loading ─────────────────────────
 async function loadData(year) {
@@ -159,7 +159,7 @@ function buildCorridorChart(corridors) {
   const ctx = document.getElementById('corridorChart').getContext('2d');
   CHARTS['corridorChart'] = new Chart(ctx, {
     type: 'bar',
-    data: { labels: corridors.map(c => `${c.from_flag} ${c.exporter} → ${c.to_flag} ${c.importer}`),
+    data: { labels: corridors.map(c => `${c.exporter} → ${c.importer}`),
       datasets: [{ data: corridors.map(c => c.value_b),
         backgroundColor: corridors.map((_, i) => CHART_COLORS[i % CHART_COLORS.length] + 'cc'), borderRadius: 4, barPercentage: .75 }] },
     options: {
@@ -244,7 +244,7 @@ async function buildMap(mapData) {
       const d = byId.get(+f.id);
       const tt = document.getElementById('mapTooltip');
       if (!d) { tt.classList.remove('visible'); return; }
-      document.getElementById('ttCountry').textContent = `${d.flag || ''} ${d.country}`;
+      document.getElementById('ttCountry').textContent = d.country;
       document.getElementById('ttExport').textContent = d.export_b ? fmtB(d.export_b) : 'N/A';
       document.getElementById('ttImport').textContent = d.import_b ? fmtB(d.import_b) : 'N/A';
       const bal = d.export_b - d.import_b;
@@ -377,7 +377,7 @@ async function handleQuery(query) {
       const names = [...new Set(data.tools_used.map(t => t.tool))].join(', ');
       const note = document.createElement('div');
       note.style.cssText = 'font-size:10px;color:var(--text2);margin-top:8px;opacity:.7';
-      note.textContent = '⚙ queried: ' + names;
+      note.textContent = 'queried: ' + names;
       el.appendChild(note);
     }
     // only push to history if it was a real model reply (not a key-missing notice)
@@ -431,10 +431,10 @@ function applyTheme(theme) {
   try { localStorage.setItem('ps-theme', theme); } catch (e) {}
   updateThemeIcon();
   refreshChartTheme();
-  if (DATA) render(DATA);                                  // re-render trade charts + map
+  if (DATA) render(DATA); // re-render trade charts + map
   const catBox = document.getElementById('socialCategory');
   if (window._currentCategory && catBox && catBox.style.display === 'block' && window.openCategory)
-    window.openCategory(window._currentCategory);          // re-render category charts
+    window.openCategory(window._currentCategory); // re-render category charts
   window.dispatchEvent(new Event('resize'));
 }
 document.getElementById('themeToggle').addEventListener('click',

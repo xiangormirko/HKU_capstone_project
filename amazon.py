@@ -124,8 +124,8 @@ class AmazonData:
                         
                     reviews.append(r_dict)
         except Exception as e:
-            print(f"❌ Database Query Error (Amazon Reviews): {e}")
-            return []  # Return empty list on connection/query failure
+            print(f"Database Query Error (Amazon Reviews): {e}")
+            return [] # Return empty list on connection/query failure
 
         return reviews
 

@@ -24,8 +24,6 @@ sentiment granularity. Brand origin makes the sourcing link category-specific.
 
 from collections import Counter, defaultdict
 
-from imageio import formats
-
 from social import get_social
 from analytics import get_data
 from amazon import get_amazon

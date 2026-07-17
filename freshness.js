@@ -69,7 +69,7 @@ async function startRefresh(source, bar, btn) {
     btn.disabled = false;
     const txt = bar.querySelector('.fresh-txt');
     if (fr.last_status === 'refreshed') {
-      status.textContent = ' · ✓ updated';
+      status.textContent = ' · updated';
       if (txt) txt.innerHTML = 'Updated <strong>just now</strong>';
       // reload the open category page so the new data shows
       if (window._currentCategory && window.openCategory) setTimeout(() => window.openCategory(window._currentCategory), 600);
@@ -78,7 +78,7 @@ async function startRefresh(source, bar, btn) {
       if (txt) txt.innerHTML = 'Updated <strong>' + fmtAgo(fr.last_fetched_age_s) + '</strong>';
       const label = fr.last_status === 'credentials_required' ? 'live fetch needs API token'
         : fr.last_status === 'scheduled_only' ? 'runs on the weekly scheduler'
-        : fr.last_status === 'reprocessed' ? '✓ reprocessed'
+        : fr.last_status === 'reprocessed' ? 'reprocessed'
         : fr.last_status;
       status.textContent = ' · ' + label;
       if (fr.note) bar.title = fr.note;

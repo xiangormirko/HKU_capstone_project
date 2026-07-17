@@ -37,11 +37,11 @@ load_dotenv()
 
 # ── ENVIRONMENT VARIABLE EXTRACTION & VALIDATION ──────────────────────────
 POSTGRES_CONFIG = {
-    "dbname":   os.getenv("DB_NAME", "capstone_db"),
-    "user":     os.getenv("DB_USER", "postgres"),
+    "dbname": os.getenv("DB_NAME", "capstone_db"),
+    "user": os.getenv("DB_USER", "postgres"),
     "password": os.getenv("DB_PASSWORD"),
-    "host":     os.getenv("DB_HOST", "localhost"),
-    "port":     int(os.getenv("DB_PORT", 5432))
+    "host": os.getenv("DB_HOST", "localhost"),
+    "port": int(os.getenv("DB_PORT", 5432))
 }
 
 SQLALCHEMY_URL = f"postgresql://{POSTGRES_CONFIG['user']}:{POSTGRES_CONFIG['password']}@{POSTGRES_CONFIG['host']}:{POSTGRES_CONFIG['port']}/{POSTGRES_CONFIG['dbname']}"
@@ -96,61 +96,61 @@ def task_google_trends():
     """Triggers Phase 3: Global Time-series Analytics Gathering (Full 5-Year History Backfill)"""
     logger.info("Executing Scheduled Job: Google Trends Sync Loop...")
     
-    # 🌍 Full 13 countries from google_trends_v2.py
+    # Full 13 countries from google_trends_v2.py
     countries = ['HK', 'JP', 'KR', 'TW', 'SG', 'TH', 'PH', 'MY', 'US', 'GB', 'FR', 'DE', 'AU']
     
-    # 📦 Full query definitions from google_trends_v2.py
+    # Full query definitions from google_trends_v2.py
     queries = [
         # ── MOISTURIZER & HYDRATION ───────────────────────────────────────────
         {
-            'id':       'moisturizer_baseline',
+            'id': 'moisturizer_baseline',
             'category': 'moisturizer_hydration',
-            'type':     'baseline',
+            'type': 'baseline',
             'keywords': ['moisturizer'],
         },
         {
-            'id':       'moisturizer_subcategories',
+            'id': 'moisturizer_subcategories',
             'category': 'moisturizer_hydration',
-            'type':     'subcategory',
+            'type': 'subcategory',
             'keywords': ['hydrating serum', 'ceramide moisturizer', 'barrier cream', 'skin flooding'],
         },
         # ── SUNSCREEN / SPF ───────────────────────────────────────────────────
         {
-            'id':       'sunscreen_baseline',
+            'id': 'sunscreen_baseline',
             'category': 'sunscreen_spf',
-            'type':     'baseline',
+            'type': 'baseline',
             'keywords': ['sunscreen'],
         },
         {
-            'id':       'sunscreen_subcategories',
+            'id': 'sunscreen_subcategories',
             'category': 'sunscreen_spf',
-            'type':     'subcategory',
+            'type': 'subcategory',
             'keywords': ['mineral sunscreen', 'tinted sunscreen', 'SPF moisturizer', 'reef safe sunscreen'],
         },
         # ── CLEANSER & OIL CONTROL ────────────────────────────────────────────
         {
-            'id':       'cleanser_baseline',
+            'id': 'cleanser_baseline',
             'category': 'cleanser_oil_control',
-            'type':     'baseline',
+            'type': 'baseline',
             'keywords': ['face wash'],
         },
         {
-            'id':       'cleanser_subcategories',
+            'id': 'cleanser_subcategories',
             'category': 'cleanser_oil_control',
-            'type':     'subcategory',
+            'type': 'subcategory',
             'keywords': ['double cleansing', 'micellar water', 'oil control cleanser', 'salicylic acid cleanser'],
         },
         # ── BRANDS (cross-category) ───────────────────────────────────────────
         {
-            'id':       'brands_tier1',
+            'id': 'brands_tier1',
             'category': 'brands',
-            'type':     'brand',
+            'type': 'brand',
             'keywords': ['CeraVe', 'La Roche-Posay', 'Neutrogena', 'Cetaphil', 'Laneige'],
         },
         {
-            'id':       'brands_tier2',
+            'id': 'brands_tier2',
             'category': 'brands',
-            'type':     'brand',
+            'type': 'brand',
             'keywords': ['CeraVe', 'The Ordinary', 'COSRX', 'Anua', 'Torriden'],
         },
     ]
@@ -182,11 +182,11 @@ def task_amazon_apify():
     # 2. Centralized Product-to-Category mapping
     # Matches exactly the categories expected by your amazon.py frontend service
     PRODUCT_CATEGORY_MAP = {
-        "B0BVV8BNYJ": "Cleanser & Oil Control",    # Anua Heartleaf Cleansing Foam
-        "B0BN2PX8V3": "Cleanser & Oil Control",    # Anua Heartleaf Cleansing Oil
-        "B07RJ18VMF": "Moisturizer & Hydration",   # COSRX Snail Mucin Essence
-        "B08CQ9T6KN": "Sunscreen / SPF",           # Beauty of Joseon Sunscreen
-        "B09Y4HHY1P": "Sunscreen / SPF"            # Round Lab Sunscreen
+        "B0BVV8BNYJ": "Cleanser & Oil Control", # Anua Heartleaf Cleansing Foam
+        "B0BN2PX8V3": "Cleanser & Oil Control", # Anua Heartleaf Cleansing Oil
+        "B07RJ18VMF": "Moisturizer & Hydration", # COSRX Snail Mucin Essence
+        "B08CQ9T6KN": "Sunscreen / SPF", # Beauty of Joseon Sunscreen
+        "B09Y4HHY1P": "Sunscreen / SPF" # Round Lab Sunscreen
     }
     
     # Extract only the unique list of ASINs to send in a single batch request
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     # Job 5: Apify Amazon Interface - Fires every 24 hours
     scheduler.add_job(task_amazon_apify, 'interval', hours=24, id='job_amazon_apify', max_instances=1)
 
-    # Job 6: UN Comtrade Analytics Engine - Cron style triggering every Sunday at 2 AM 👈 Add this
+    # Job 6: UN Comtrade Analytics Engine - Cron style triggering every Sunday at 2 AM Add this
     scheduler.add_job(task_un_comtrade_sync, 'cron', day_of_week='sun', hour=2, minute=0, id='job_un_comtrade_sync')
 
     try:

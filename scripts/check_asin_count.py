@@ -24,14 +24,14 @@ try:
     """)
     rows = cur.fetchall()
     
-    print("\n📊 每個 ASIN 在資料庫中的實際評論分佈：")
+    print("\n每個 ASIN 在資料庫中的實際評論分佈：")
     print("-" * 40)
     for row in rows:
         print(f"ASIN: {row[0]} | 評論數: {row[1]} 筆")
     print("-" * 40)
     
 except Exception as e:
-    print(f"❌ 查詢失敗: {e}")
+    print(f"查詢失敗: {e}")
 finally:
     if 'cur' in locals(): cur.close()
     if 'conn' in locals(): conn.close()

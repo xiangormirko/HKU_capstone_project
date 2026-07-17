@@ -30,7 +30,7 @@ function renderHome(d) {
   // AI brief
   if (d.brief) {
     document.getElementById('homeBrief').style.display = 'flex';
-    document.getElementById('homeBriefText').innerHTML = d.brief;  // server-built, trusted
+    document.getElementById('homeBriefText').innerHTML = d.brief; // server-built, trusted
   }
 
   // freshness bars (trends + amazon + trade)
@@ -154,7 +154,7 @@ async function hcSend(text) {
       const names = [...new Set(data.tools_used.map(t => t.tool))].join(', ');
       const note = document.createElement('div');
       note.className = 'tool-note';
-      note.textContent = '⚙ queried: ' + names;
+      note.textContent = 'queried: ' + names;
       el.querySelector('.hc-bubble').appendChild(note);
     }
     if (!data.needs_key && !data.error) homeChatHistory.push({ role: 'assistant', content: stripHtml(reply) });

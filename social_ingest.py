@@ -2,7 +2,7 @@
 Social Ingestion + Entity/Sentiment Pipeline for Product Scout (PostgreSQL Engine).
 Role: Scheduler 2 (Consumer/Transformer)
 
-Input:  Enriched raw posts from `reddit_posts` where deep_scan = TRUE and pipeline_processed = FALSE.
+Input: Enriched raw posts from `reddit_posts` where deep_scan = TRUE and pipeline_processed = FALSE.
 Output: Processed relational/JSONB analytics stored into PostgreSQL target tables:
         - social_posts
         - social_relationships
@@ -39,7 +39,7 @@ db_name = os.getenv("DB_NAME", "capstone_db")
 DATABASE_URL = os.getenv("DATABASE_URL") or f"postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
 
 if not DATABASE_URL:
-    print("❌ Error: Missing database configurations in .env file.")
+    print("Error: Missing database configurations in .env file.")
     sys.exit(1)
 
 engine = create_engine(DATABASE_URL)
@@ -275,7 +275,7 @@ def run():
     # -------------------------------------------------------------------------
     # STEP 1: Fetch raw posts where deep_scanned = TRUE and pipeline_processed = FALSE
     # -------------------------------------------------------------------------
-    print("📥 Querying deep-scanned raw posts from database...")
+    print("Querying deep-scanned raw posts from database...")
     with engine.connect() as conn:
         post_rows = conn.execute(text(
             "SELECT id, subreddit, title, content, permalink, created_utc "
@@ -283,7 +283,7 @@ def run():
         )).mappings().all()
 
         if not post_rows:
-            print("😴 No new deep-scanned raw reddit posts available for NLP processing. Exiting.")
+            print("No new deep-scanned raw reddit posts available for NLP processing. Exiting.")
             return
 
         posts_in = {r["id"]: dict(r) for r in post_rows}
@@ -292,7 +292,7 @@ def run():
         # -------------------------------------------------------------------------
         # STEP 2: Fetch related comments for this active batch
         # -------------------------------------------------------------------------
-        print(f"📥 Fetching raw comments for {len(post_ids)} active posts...")
+        print(f"Fetching raw comments for {len(post_ids)} active posts...")
         comment_rows = conn.execute(text(
             "SELECT id, post_id, body, ups, author FROM reddit_comments WHERE post_id IN :pids"
         ), {"pids": post_ids}).mappings().all()
@@ -321,7 +321,7 @@ def run():
     # -------------------------------------------------------------------------
     # CORE PROCESSING LOOP (VADER Sentiment & Entity Aggregation)
     # -------------------------------------------------------------------------
-    print("🧠 Processing NLP analytics layers...")
+    print("Processing NLP analytics layers...")
     for pid, p in posts_in.items():
         title = p.get("title", "") or ""
         content = p.get("content", "") or ""
@@ -431,7 +431,7 @@ def run():
     # -------------------------------------------------------------------------
     # STEP 3: Persist Analytical Layers into PostgreSQL System Tables
     # -------------------------------------------------------------------------
-    print("💾 Syncing processed analytical results to target database tables...")
+    print("Syncing processed analytical results to target database tables...")
     with engine.begin() as conn:
 
         # 1. UPSERT into social_posts (keeps existing rows updated instead of wiping them)
@@ -509,11 +509,11 @@ def run():
         # -------------------------------------------------------------------------
         # STEP 4: Synchronize Pipeline State (Acknowledge processing is done)
         # -------------------------------------------------------------------------
-        print("🔄 Marking processed raw posts as pipeline completed (pipeline_processed = TRUE)...")
+        print("Marking processed raw posts as pipeline completed (pipeline_processed = TRUE)...")
         conn.execute(text("UPDATE reddit_posts SET pipeline_processed = TRUE WHERE id IN :ids"), {"ids": post_ids})
 
-    print(f"✨ Successfully transformed and synchronized {len(posts_out)} records into the system tables.")
+    print(f"Successfully transformed and synchronized {len(posts_out)} records into the system tables.")
 
 if __name__ == "__main__":
-    print("🚀 Starting Database-Driven Social Ingestion Pipeline...")
+    print("Starting Database-Driven Social Ingestion Pipeline...")
     run()
