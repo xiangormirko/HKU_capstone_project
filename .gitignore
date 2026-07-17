@@ -23,3 +23,4 @@ scheduler/.env
 # Report figures / ad-hoc screenshots (belong with the report, not the code repo)
 report_assets/
 screenshots/
+.claude/
