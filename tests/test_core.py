@@ -104,7 +104,9 @@ def test_home_pain_points_pass_negativity_floor():
     assert pts, "expected pain points from Amazon data"
     for p in pts:
         pct = float(p["meta"].split("%")[0])
+        mentions = int(p["metric"].replace(",", ""))
         assert pct >= 20
+        assert mentions >= 30
         assert p["metric"] and p["label"] == "Complaints"
 
 
