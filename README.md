@@ -108,7 +108,8 @@ The client-facing API exposes `/api/data`, `/api/home`, `/api/fusion`,
 ## 5. Requirements
 
 - Python 3.12
-- PostgreSQL 14 or later
+- PostgreSQL 14 or later to run the application; PostgreSQL 18 (or a newer
+  `pg_restore`) to restore the provided database dump described in Section 6.4
 - Python packages in `requirements.txt` (Flask, pandas, SQLAlchemy, psycopg2,
   vaderSentiment, APScheduler, anthropic, pycountry, pytest, and related)
 - Live data collection additionally requires `curl_cffi`, `pytrends`, and the
@@ -150,31 +151,51 @@ DB_PORT=5432
 # REDDIT_COOKIE=...                   # Reddit collector
 ```
 
-### 6.3 Create the database and tables
+### 6.3 Create the database
 
 ```bash
-python scheduler/make_db.py          # creates the capstone_db database
+python scheduler/make_db.py          # creates the empty capstone_db database
+```
+
+### 6.4 Load the data
+
+Choose one of the two options below. Option A is the fastest and needs no
+credentials or scraping.
+
+**Option A — Restore the provided database snapshot (recommended).**
+
+`capstone_db_backup.dump` is a complete snapshot of `capstone_db`, containing all
+13 tables with their data, so the application runs immediately with no scraping
+or API keys. It is a PostgreSQL custom-format archive produced with `pg_dump`
+version 18, so it is restored with `pg_restore` using a PostgreSQL 18 client or
+newer. Place the file in the project root, then run:
+
+```bash
+pg_restore --no-owner --no-privileges -U postgres -d capstone_db capstone_db_backup.dump
+```
+
+The `--no-owner --no-privileges` flags let any local role own the restored
+objects, and restoring into the pre-created `capstone_db` avoids the archive's
+original (Windows) locale settings. `scheduler/create_tables.py` is not needed
+when restoring the dump, since the archive already contains the schema.
+
+> The dump (~20 MB) contains scraped Reddit and Amazon content and is therefore
+> distributed alongside the submission rather than committed to the repository
+> (it is excluded by `.gitignore`).
+
+**Option B — Create the tables and collect the data from source.**
+
+```bash
 python scheduler/create_tables.py    # creates all 13 tables
-```
-
-### 6.4 Populate the data
-
-UN Comtrade requires no credentials and can be loaded directly:
-
-```bash
-python scheduler/fetch_data.py       # loads HS 3304 annual, monthly, bilateral
-```
-
-Reddit, Amazon, and Google Trends are collected by the scheduler and require the
-credentials in `.env`. To run the collectors once and transform the Reddit data:
-
-```bash
-python scheduler/main_scheduler.py   # runs the recurring collection daemon
+python scheduler/fetch_data.py       # loads UN Comtrade trade (no credentials needed)
+python scheduler/main_scheduler.py   # runs the collectors (Reddit/Amazon/Trends)
 python social_ingest.py              # transforms raw Reddit into analytics tables
 ```
 
-Without live credentials, the trade layer and the committed sample data are
-sufficient to demonstrate the Trade Intelligence, Home, and Source-to-Sell views.
+UN Comtrade requires no credentials; Reddit, Amazon, and Google Trends require
+the credentials in `.env` (`REDDIT_COOKIE`, `APIFY_API_TOKEN`). With the trade
+layer alone, the Trade Intelligence, Home, and Source-to-Sell views are already
+demonstrable.
 
 ### 6.5 Run the application
 
