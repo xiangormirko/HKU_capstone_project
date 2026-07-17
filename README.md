@@ -149,15 +149,24 @@ DB_PORT=5432
 # APIFY_API_TOKEN=...                 # Amazon reviews
 # REDDIT_COOKIE=...                   # Reddit collector
 ```
+### 6.3 Quick Start: Restore from Database Dump (Recommended for Grading)
 
-### 6.3 Create the database and tables
+To review the project without needing to run the scrapers or wait for data ingestion, a pre-populated PostgreSQL database dump (`capstone_db_backup.dump`) is provided. This contains the fully processed datasets matching the exact figures and findings detailed in the Final Report.
+
+1. Create a new empty database named `capstone_db`:
+   ```bash
+   createdb -U postgres capstone_db
+2. Restore the data from the provided dump file 
+   pg_restore -U postgres -d capstone_db -1 capstone_db_backup.dump
+3. Proceed directly to 6.6 Run the application. No active web scraping or API keys (other than Anthropic Claude) are required to view the primary analytics.
+### 6.4 Create the database and tables
 
 ```bash
 python scheduler/make_db.py          # creates the capstone_db database
 python scheduler/create_tables.py    # creates all 13 tables
 ```
 
-### 6.4 Populate the data
+### 6.5 Populate the data
 
 UN Comtrade requires no credentials and can be loaded directly:
 
@@ -176,7 +185,7 @@ python social_ingest.py              # transforms raw Reddit into analytics tabl
 Without live credentials, the trade layer and the committed sample data are
 sufficient to demonstrate the Trade Intelligence, Home, and Source-to-Sell views.
 
-### 6.5 Run the application
+### 6.6 Run the application
 
 ```bash
 python server.py                     # serves http://localhost:8600
@@ -185,7 +194,7 @@ python server.py                     # serves http://localhost:8600
 Without an `ANTHROPIC_API_KEY`, the dashboard runs normally on the database and
 the AI panel displays a "connect your key" notice.
 
-### 6.6 Recurring refresh (optional)
+### 6.7 Recurring refresh (optional)
 
 To run the scheduler inside the web process:
 
