@@ -70,14 +70,14 @@ function amazonModule(a, fr) {
       <div class="amz-stat"><div class="v stars-amz">${sm.avg_rating_weighted}★</div><div class="l">avg rating (weighted)</div></div>
       <div class="amz-stat"><div class="v">${sm.n_products}</div><div class="l">products tracked</div></div>
       <div class="amz-stat"><div class="v">${(sm.total_ratings || 0).toLocaleString()}</div><div class="l">total ratings (reach)</div></div>
-      ${pp ? `<div class="amz-stat"><div class="v" style="color:var(--negative);font-size:15px">${esc(pp.name)}</div><div class="l">top pain point</div><div class="s">${pp.neg_rate}% neg · ${pp.mentions.toLocaleString()} mentions</div></div>` : ''}
+      ${pp ? `<div class="amz-stat"><div class="v" style="color:var(--negative);font-size:15px">${esc(pp.name)}</div><div class="l">top pain point</div><div class="s">${pp.neg_rate}% neg · ${(pp.mentions||0).toLocaleString()} mentions</div></div>` : ''}
       ${best ? `<div class="amz-stat"><div class="v" style="font-size:15px">${esc(best.brand)}</div><div class="l">best-in-class</div><div class="s">${best.avg_rating}★ · ${(best.total_ratings||0).toLocaleString()} ratings</div></div>` : ''}
     </div>`;
 
   const callout = `
     <div class="insight-callout">
       <div class="ic-title">Sourcer insights · compiled from the reviews</div>
-      ${sm.insights.map(i => `<div class="ic-row"><span class="ic-tag ${i.tone}">${esc(i.tag)}</span><span>${i.text}</span></div>`).join('')}
+      ${(sm.insights || []).map(i => `<div class="ic-row"><span class="ic-tag ${i.tone}">${esc(i.tag)}</span><span>${i.text}</span></div>`).join('')}
     </div>`;
 
   const rows = a.products.map(p => {
@@ -114,11 +114,10 @@ function amazonModule(a, fr) {
       <div class="voc-grid">
         <div>
           <div class="voc-col-label" style="color:var(--negative)">What buyers complain about</div>
-          ${voc.negative.map(q => quoteCard(q, 'var(--negative)')).join('') || '<div style="color:var(--text2);font-size:12px">No low-rating reviews in sample.</div>'}
-        </div>
+          ${(voc?.negative || []).map(q => quoteCard(q, 'var(--negative)')).join('') || '<div style="color:var(--text2);font-size:12px">No low-rating reviews in sample.</div>'}
         <div>
           <div class="voc-col-label" style="color:var(--positive)">What buyers love</div>
-          ${voc.positive.map(q => quoteCard(q, 'var(--positive)')).join('')}
+          ${(voc?.positive || []).map(q => quoteCard(q, 'var(--positive)')).join('') || '<div style="color:var(--text2);font-size:12px">No positive reviews in sample.</div>'}
         </div>
       </div>
     </div>`;
